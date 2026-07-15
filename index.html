@@ -125,6 +125,9 @@
 
   <button id="soundBtn" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 8; background: rgba(20,24,29,.85); color: #9a9488; border: 1px solid #2b2f34; border-radius: 22px; padding: 9px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px; cursor: pointer;">🔇 SOUND OFF</button>
 
+  <!-- Hidden jackpot trigger: invisible hotspot, top-right corner of the screen. See README. -->
+  <button id="secretBtn" aria-hidden="true" tabindex="-1" style="position: fixed; top: 0; right: 0; width: 72px; height: 72px; z-index: 9; background: transparent; border: none; padding: 0; margin: 0; cursor: default; -webkit-tap-highlight-color: transparent;"></button>
+
 </div>
 
 <script>
@@ -134,7 +137,13 @@
    * trip, or set of jokes lives here. Nothing below this block needs to
    * be touched for a re-skin.
    *
-   * winWord / destWord / loseWord1 / crashWord must each be exactly 3
+   * The lever always loses — it cycles through `losses` forever, looping
+   * back to the start. The jackpot never happens on its own; it only
+   * fires when the hidden trigger (invisible button, top-right corner of
+   * the screen — see README) is pressed. If pressed mid-spin, the jackpot
+   * plays right after the current loss finishes instead of cutting it off.
+   *
+   * winWord / destWord and every `word` in `losses` must be exactly 3
    * characters (or emoji) — they're rendered one-per-reel.
    * ===================================================================== */
   const CONFIG = {
@@ -145,20 +154,18 @@
     // Idle / system captions
     idleCaption: '拉下拉桿，開始你的生日抽獎 🎂',
     rebootCaption: '…系統回復中…',
-    errorCaption: 'ERR 404 — PRIZE NOT FOUND',
 
-    // Pull 1 — first "loss". Reels land on loseWord1, caption becomes joke1.
-    loseWord1: ['N', 'O', '!'],
-    joke1: '恭喜獲得：你欠我的那杯珍奶（本人親自兌換）',
+    // Losses the lever cycles through forever (loops back to index 0).
+    // type: 'plain' (reels land directly on `word`) | 'tease' (reels tease
+    // winWord then slip to `symbol`) | 'crash' (fake system crash, 3s
+    // silence, reboot). `caption` is shown once the reels stop.
+    losses: [
+      { type: 'plain', word: ['N', 'O', '!'], caption: '恭喜獲得：你欠我的那杯珍奶（本人親自兌換）' },
+      { type: 'tease', symbol: '💩', caption: '差一個字。獎品：一句「欸差一點欸」' },
+      { type: 'crash', word: ['4', '0', '4'], caption: 'ERR 404 — PRIZE NOT FOUND' },
+    ],
 
-    // Pull 2 — near-miss. Reels tease winWord, then slip to loseSymbol2.
-    loseSymbol2: '💩',
-    joke2: '差一個字。獎品：一句「欸差一點欸」',
-
-    // Pull 3 — fake system crash. Reels land on crashWord.
-    crashWord: ['4', '0', '4'],
-
-    // Pull 4 — jackpot. Reels land on winWord.
+    // Jackpot (only reachable via the hidden trigger). Reels land on winWord.
     winWord: ['H', 'B', 'D'],
 
     // Departure board: winWord → destWord (usually the destination code)
@@ -185,22 +192,25 @@
     stage: $('stage'), machine: $('machine'), lightbox: $('lightbox'), title: $('title'),
     marquee: $('marquee'), caption: $('caption'), leverKnob: $('leverKnob'),
     board: $('board'), boardTop: $('boardTop'), boardBottom: $('boardBottom'),
-    pass: $('pass'), barcode: $('barcode'), soundBtn: $('soundBtn'),
+    pass: $('pass'), barcode: $('barcode'), soundBtn: $('soundBtn'), secretBtn: $('secretBtn'),
     flap0: $('flap0'), flap1: $('flap1'), flap2: $('flap2'),
     cell0: $('cell0'), cell1: $('cell1'), cell2: $('cell2'),
   };
 
   const rm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const BASE_POOL = ['A','K','U','F','8','2','6','9','T','G','0','5','P','E','N','H','B','D'];
+  const LOSS_CHARS = CONFIG.losses.flatMap(l => l.word || []);
   const POOL = Array.from(new Set([
-    ...BASE_POOL, ...CONFIG.winWord, ...CONFIG.destWord, ...CONFIG.loseWord1, ...CONFIG.crashWord,
+    ...BASE_POOL, ...CONFIG.winWord, ...CONFIG.destWord, ...LOSS_CHARS,
   ]));
   const SLIP_CHARS = POOL.filter(c => c !== CONFIG.winWord[2]).slice(0, 4);
 
   const state = {
     busy: false,
     leverDisabled: false,
-    spinCount: 0,
+    pullIndex: 0,
+    pendingJackpot: false,
+    gameOver: false,
     soundOn: false,
     climaxOn: false,
     reelTimers: {},
@@ -480,22 +490,18 @@
     snd('ding2');
   }
 
-  /* ---------- pull scripts ---------- */
-  async function doPull1() {
-    leverPull();
-    caption('', '');
+  /* ---------- loss pulls (cycle forever) ---------- */
+  async function doPlainLoss(entry) {
     [0,1,2].forEach(i => startReel(i));
-    await wait(650); stopReel(0, CONFIG.loseWord1[0]);
-    await wait(420); stopReel(1, CONFIG.loseWord1[1]);
-    await wait(420); stopReel(2, CONFIG.loseWord1[2]);
+    await wait(650); stopReel(0, entry.word[0]);
+    await wait(420); stopReel(1, entry.word[1]);
+    await wait(420); stopReel(2, entry.word[2]);
     snd('sad');
-    caption(CONFIG.joke1, 'meh');
+    caption(entry.caption, 'meh');
   }
-  async function doPull2() {
-    leverPull();
-    caption('', '');
+  async function doTeaseLoss(entry) {
     [0,1,2].forEach(i => startReel(i));
-    const [w0, w1, w2] = CONFIG.winWord;
+    const [w0, w1, w2] = entry.word || CONFIG.winWord;
     await wait(900); stopReel(0, w0); caption(`${w0}…`, 'win');
     await wait(700); stopReel(1, w1); caption(`${w0} ${w1}…！`, 'win');
     await wait(480);
@@ -504,13 +510,11 @@
     caption(`${w0} ${w1} ${w2}？！`, 'win');
     await wait(300);
     for (const c of SLIP_CHARS) { setFlap(2, c, true); await wait(115); }
-    stopReel(2, CONFIG.loseSymbol2);
+    stopReel(2, entry.symbol);
     snd('sad');
-    caption(CONFIG.joke2, 'meh');
+    caption(entry.caption, 'meh');
   }
-  async function doPull3() {
-    leverPull();
-    caption('', '');
+  async function doCrashLoss(entry) {
     [0,1,2].forEach(i => startReel(i));
     await wait(800);
     [0,1,2].forEach(i => clearReel(i));
@@ -521,9 +525,9 @@
     nodes.machine.style.filter = 'grayscale(1) brightness(.62)';
     await wait(500);
     twitch(false);
-    setFlap(0, CONFIG.crashWord[0], true); setFlap(1, CONFIG.crashWord[1], true); setFlap(2, CONFIG.crashWord[2], true);
+    setFlap(0, entry.word[0], true); setFlap(1, entry.word[1], true); setFlap(2, entry.word[2], true);
     [0,1,2].forEach(i => { const e = nodes['flap'+i]; if (e) e.style.color = '#FF6161'; });
-    caption(CONFIG.errorCaption, 'err');
+    caption(entry.caption, 'err');
     snd('error');
     leverGrey(true);
     await new Promise(r => setTimeout(r, 3000));
@@ -542,11 +546,19 @@
     if (nodes.lightbox) nodes.lightbox.style.boxShadow = '';
     startChase();
     caption(CONFIG.rebootCaption, 'meh');
-    await wait(1100);
-    state.spinCount = 4;
-    await doPull4();
-    state.busy = false;
+    await wait(900);
   }
+  async function doLossPull() {
+    const entry = CONFIG.losses[state.pullIndex % CONFIG.losses.length];
+    state.pullIndex++;
+    leverPull();
+    caption('', '');
+    if (entry.type === 'crash') await doCrashLoss(entry);
+    else if (entry.type === 'tease') await doTeaseLoss(entry);
+    else await doPlainLoss(entry);
+  }
+
+  /* ---------- jackpot (only via the hidden trigger) ---------- */
   async function reel2ExtraLoop() {
     const dur = rm ? 420 : 820;
     const t0 = Date.now();
@@ -557,7 +569,7 @@
       await wait(rm ? 70 : 46);
     }
   }
-  async function doPull4() {
+  async function doJackpotPull() {
     caption('', '');
     leverPull();
     await wait(300);
@@ -579,16 +591,38 @@
     await boardFlipBottom();
     await wait(500);
     revealPass();
+    state.gameOver = true;
+  }
+
+  /* ---------- pull dispatcher: losses forever, jackpot only when triggered ---------- */
+  async function runPull() {
+    if (state.pendingJackpot) {
+      state.pendingJackpot = false;
+      await doJackpotPull();
+      return;
+    }
+    await doLossPull();
+    if (state.pendingJackpot) {
+      state.pendingJackpot = false;
+      await doJackpotPull();
+    }
   }
 
   /* ---------- controls ---------- */
   function onLever() {
-    if (state.busy || state.leverDisabled) return;
+    if (state.busy || state.leverDisabled || state.gameOver) return;
     initAudio();
-    const n = state.spinCount;
-    if (n === 0) { state.busy = true; state.spinCount = 1; doPull1().then(() => state.busy = false); }
-    else if (n === 1) { state.busy = true; state.spinCount = 2; doPull2().then(() => state.busy = false); }
-    else if (n === 2) { state.busy = true; state.spinCount = 3; doPull3(); }
+    state.busy = true;
+    runPull().then(() => { state.busy = false; });
+  }
+  function onSecret() {
+    if (state.gameOver) return;
+    state.pendingJackpot = true;
+    if (!state.busy) {
+      initAudio();
+      state.busy = true;
+      runPull().then(() => { state.busy = false; });
+    }
   }
   function onTitleTap() {
     const now = Date.now();
@@ -598,7 +632,8 @@
   }
   function reset() {
     clearAllTimers();
-    state.busy = false; state.leverDisabled = false; state.spinCount = 0; state.climaxOn = false;
+    state.busy = false; state.leverDisabled = false; state.gameOver = false;
+    state.pendingJackpot = false; state.pullIndex = 0; state.climaxOn = false;
     state.reelIdx = { 0: 0, 1: 0, 2: 0 };
     const m = nodes.machine;
     m.style.display = ''; m.style.transition = 'none'; m.style.opacity = '1'; m.style.transform = 'none'; m.style.filter = 'none'; m.style.animation = 'none';
@@ -655,6 +690,7 @@
   nodes.leverKnob.addEventListener('click', onLever);
   nodes.title.addEventListener('click', onTitleTap);
   nodes.soundBtn.addEventListener('click', onSound);
+  nodes.secretBtn.addEventListener('click', onSecret);
   renderConfig();
   buildBulbs();
   caption(CONFIG.idleCaption, '');
