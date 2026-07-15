@@ -196,6 +196,10 @@
     tease: { symbol: '💩', caption: '差一個字。獎品：一句「欸差一點欸」' },
     crash: { word: ['4', '0', '4'], caption: 'ERR 404 — PRIZE NOT FOUND' },
 
+    // Shown instead of a prize draw once fewer than 2 prizes have stock
+    // left (i.e. every prize with a `stock` cap has been fully claimed).
+    soldOut: { word: ['4', '0', '4'], caption: 'ERR 404 — 獎品沒了' },
+
     // Jackpot (only reachable via the hidden trigger). Reels land on winWord.
     winWord: ['H', 'B', 'D'],
 
@@ -656,9 +660,22 @@
     caption(CONFIG.rebootCaption, 'meh');
     await wait(900);
   }
+  async function doSoldOut() {
+    const entry = CONFIG.soldOut;
+    [0,1,2].forEach(i => startReel(i));
+    await wait(500); stopReel(0, entry.word[0]);
+    await wait(250); stopReel(1, entry.word[1]);
+    await wait(250); stopReel(2, entry.word[2]);
+    [0,1,2].forEach(i => { const e = nodes['flap'+i]; if (e) e.style.color = '#FF6161'; });
+    caption(entry.caption, 'err');
+    snd('error');
+    await wait(600);
+    [0,1,2].forEach(i => { const e = nodes['flap'+i]; if (e) e.style.color = '#FFB627'; });
+  }
   async function doLossPull() {
     leverPull();
     caption('', '');
+    if (availablePrizes().length < 2) { await doSoldOut(); return; }
     const r = Math.random();
     if (r < CONFIG.specialEventChance / 2) await doCrashLoss();
     else if (r < CONFIG.specialEventChance) await doTeaseLoss();

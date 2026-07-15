@@ -84,6 +84,10 @@ const CONFIG = {
   tease: { symbol: '💩', caption: '差一個字。獎品：一句「欸差一點欸」' },
   crash: { word: ['4', '0', '4'], caption: 'ERR 404 — PRIZE NOT FOUND' },
 
+  // Shown instead of a prize draw once fewer than 2 prizes have stock left
+  // (i.e. every `stock`-capped prize has been fully claimed).
+  soldOut: { word: ['4', '0', '4'], caption: 'ERR 404 — 獎品沒了' },
+
   winWord: ['H', 'B', 'D'],         // jackpot result (exactly 3 chars), only reachable via the hidden trigger
   destWord: ['F', 'U', 'K'],        // shown after winWord on the departure board
   departLabel: 'ANYTIME',
@@ -110,8 +114,12 @@ every draw picks 2). Each prize just needs an `emoji` (shown on 2 of the 3
 reels, joined by a `+`) and a `label` (the full text, any length); add
 `stock: N` to cap how many times a prize can ever be won in one session —
 once it's out, it silently stops appearing in draws and the 獎品清單 shows
-"限量款，已送完" next to it. Change the prizes, the trip, the passenger
-name, whatever — save the file and reload.
+"限量款，已送完" next to it. If you cap enough prizes that fewer than 2
+are left with stock (e.g. you give every prize a `stock`), the machine
+shows an `ERR 404 — 獎品沒了` sold-out message on every pull instead of
+drawing — right now only `黃嘟嘟為你取名頂級券` is capped, so this state
+isn't reachable unless you add `stock` to more prizes too. Change the
+prizes, the trip, the passenger name, whatever — save the file and reload.
 
 Want the hidden trigger somewhere other than the top-right corner? It's
 the `#secretBtn` element right after the `SOUND OFF` button in the HTML —
