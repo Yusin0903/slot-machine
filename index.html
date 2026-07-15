@@ -30,7 +30,7 @@
     <div id="lightbox" style="background: linear-gradient(#c8a44a, #9a751f); border-radius: 20px 20px 6px 6px; padding: 12px 14px 14px; box-shadow: 0 6px 0 #6f5416, 0 12px 24px rgba(0,0,0,.5), inset 0 2px 0 rgba(255,255,255,.35); border: 2px solid #6f5416;">
       <div id="marquee" style="display: flex; justify-content: center; gap: 8px; padding: 4px 4px 10px;"></div>
       <div id="title" style="background: #7a1a22; border-radius: 8px; border: 2px solid #5a1119; padding: 10px 8px 8px; text-align: center; cursor: pointer; box-shadow: inset 0 2px 8px rgba(0,0,0,.6); user-select: none;">
-        <div style="font-family: 'Anton', sans-serif; color: #FFB627; letter-spacing: 2px; line-height: .92; font-size: clamp(26px, 8vw, 38px); text-shadow: 0 0 10px rgba(255,182,39,.5), 0 2px 0 #3a0d12;">BIRTHDAY<br>JACKPOT</div>
+        <div style="font-family: 'Anton', sans-serif; color: #FFB627; letter-spacing: 2px; line-height: .92; font-size: clamp(26px, 8vw, 38px); text-shadow: 0 0 10px rgba(255,182,39,.5), 0 2px 0 #3a0d12;"><span id="titleLine1"></span><br><span id="titleLine2"></span></div>
       </div>
     </div>
 
@@ -81,44 +81,44 @@
       <div style="display: flex; gap: 22px; margin-top: 14px; font-family: 'JetBrains Mono', monospace;">
         <div>
           <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">PASSENGER</div>
-          <div style="font-size: 17px; font-weight: 700; letter-spacing: 1px; margin-top: 2px;">YUN YI YANG</div>
+          <div id="passPassenger" style="font-size: 17px; font-weight: 700; letter-spacing: 1px; margin-top: 2px;"></div>
         </div>
       </div>
       <div style="display: flex; align-items: flex-end; gap: 18px; margin-top: 16px; font-family: 'JetBrains Mono', monospace;">
         <div>
           <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">FROM</div>
-          <div style="font-size: 30px; font-weight: 700; line-height: 1;">TPE</div>
-          <div style="font-family: 'Noto Sans TC', sans-serif; font-size: 11px; opacity: .6;">台北桃園</div>
+          <div id="passFromCode" style="font-size: 30px; font-weight: 700; line-height: 1;"></div>
+          <div id="passFromCity" style="font-family: 'Noto Sans TC', sans-serif; font-size: 11px; opacity: .6;"></div>
         </div>
         <div style="font-size: 22px; padding-bottom: 16px;">&#9992;</div>
         <div>
           <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">TO</div>
-          <div style="font-size: 30px; font-weight: 700; line-height: 1;">FUK</div>
-          <div style="font-family: 'Noto Sans TC', sans-serif; font-size: 11px; opacity: .6;">福岡</div>
+          <div id="passToCode" style="font-size: 30px; font-weight: 700; line-height: 1;"></div>
+          <div id="passToCity" style="font-family: 'Noto Sans TC', sans-serif; font-size: 11px; opacity: .6;"></div>
         </div>
       </div>
       <div style="display: flex; gap: 22px; margin-top: 16px; font-family: 'JetBrains Mono', monospace;">
         <div>
           <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">DATE</div>
-          <div style="font-size: 15px; font-weight: 700;">OPEN</div>
-          <div style="font-family: 'Noto Sans TC', sans-serif; font-size: 10px; opacity: .6;">無使用期限</div>
+          <div id="passDate" style="font-size: 15px; font-weight: 700;"></div>
+          <div id="passDateNote" style="font-family: 'Noto Sans TC', sans-serif; font-size: 10px; opacity: .6;"></div>
         </div>
         <div>
           <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">FLIGHT</div>
-          <div style="font-size: 15px; font-weight: 700;">BD-2026</div>
+          <div id="passFlight" style="font-size: 15px; font-weight: 700;"></div>
         </div>
         <div>
           <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">GATE</div>
-          <div style="font-size: 15px; font-weight: 700;">B7</div>
+          <div id="passGate" style="font-size: 15px; font-weight: 700;"></div>
         </div>
       </div>
-      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,.3); font-family: 'Noto Sans TC', sans-serif; font-size: 15px; font-weight: 400; color: #1A1A1A;">生日快樂。這次換我帶你去。</div>
+      <div id="passMessage" style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,.3); font-family: 'Noto Sans TC', sans-serif; font-size: 15px; font-weight: 400; color: #1A1A1A;"></div>
     </div>
 
     <div style="width: 116px; background: #E4DCC9; background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.015) 0 2px, transparent 2px 4px); color: #1A1A1A; border-radius: 0 10px 10px 0; border-left: 2px dashed rgba(0,0,0,.35); padding: 18px 12px 16px; display: flex; flex-direction: column; gap: 12px; font-family: 'JetBrains Mono', monospace;">
-      <div><div style="font-size: 8px; letter-spacing: 1.5px; opacity: .55;">TO</div><div style="font-size: 24px; font-weight: 700;">FUK</div></div>
-      <div><div style="font-size: 8px; letter-spacing: 1.5px; opacity: .55;">SEAT</div><div style="font-size: 20px; font-weight: 700;">1A</div></div>
-      <div><div style="font-size: 8px; letter-spacing: 1.5px; opacity: .55;">BOARDING</div><div style="font-size: 18px; font-weight: 700;">09:25</div></div>
+      <div><div style="font-size: 8px; letter-spacing: 1.5px; opacity: .55;">TO</div><div id="stubToCode" style="font-size: 24px; font-weight: 700;"></div></div>
+      <div><div style="font-size: 8px; letter-spacing: 1.5px; opacity: .55;">SEAT</div><div id="stubSeat" style="font-size: 20px; font-weight: 700;"></div></div>
+      <div><div style="font-size: 8px; letter-spacing: 1.5px; opacity: .55;">BOARDING</div><div id="stubBoardingTime" style="font-size: 18px; font-weight: 700;"></div></div>
       <div id="barcode" style="display: flex; align-items: flex-end; gap: 2px; height: 40px; margin-top: auto;"></div>
     </div>
   </div>
@@ -129,10 +129,56 @@
 
 <script>
 (() => {
-  // ---- tweakable copy ----
-  const JOKE1 = '恭喜獲得：你欠我的那杯珍奶（本人親自兌換）';
-  const JOKE2 = '差一個字。獎品：一句「欸差一點欸」';
-  const DEPART_LABEL = 'ANYTIME';
+  /* =====================================================================
+   * CONFIG — everything you'd want to change for a different recipient,
+   * trip, or set of jokes lives here. Nothing below this block needs to
+   * be touched for a re-skin.
+   *
+   * winWord / destWord / loseWord1 / crashWord must each be exactly 3
+   * characters (or emoji) — they're rendered one-per-reel.
+   * ===================================================================== */
+  const CONFIG = {
+    // Title plate (two lines)
+    titleLine1: 'BIRTHDAY',
+    titleLine2: 'JACKPOT',
+
+    // Idle / system captions
+    idleCaption: '拉下拉桿，開始你的生日抽獎 🎂',
+    rebootCaption: '…系統回復中…',
+    errorCaption: 'ERR 404 — PRIZE NOT FOUND',
+
+    // Pull 1 — first "loss". Reels land on loseWord1, caption becomes joke1.
+    loseWord1: ['N', 'O', '!'],
+    joke1: '恭喜獲得：你欠我的那杯珍奶（本人親自兌換）',
+
+    // Pull 2 — near-miss. Reels tease winWord, then slip to loseSymbol2.
+    loseSymbol2: '💩',
+    joke2: '差一個字。獎品：一句「欸差一點欸」',
+
+    // Pull 3 — fake system crash. Reels land on crashWord.
+    crashWord: ['4', '0', '4'],
+
+    // Pull 4 — jackpot. Reels land on winWord.
+    winWord: ['H', 'B', 'D'],
+
+    // Departure board: winWord → destWord (usually the destination code)
+    destWord: ['F', 'U', 'K'],
+    departLabel: 'ANYTIME',
+    gate: 'B7',
+
+    // Boarding pass
+    passengerName: 'YUN YI YANG',
+    fromCode: 'TPE',
+    fromCity: '台北桃園',
+    toCode: 'FUK',
+    toCity: '福岡',
+    date: 'OPEN',
+    dateNote: '無使用期限',
+    flightNumber: 'BD-2026',
+    seat: '1A',
+    boardingTime: '09:25',
+    passMessage: '生日快樂。這次換我帶你去。',
+  };
 
   const $ = (id) => document.getElementById(id);
   const nodes = {
@@ -145,7 +191,11 @@
   };
 
   const rm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const POOL = ['H','B','D','A','K','U','F','8','2','6','9','T','G','0','5','P','E','N'];
+  const BASE_POOL = ['A','K','U','F','8','2','6','9','T','G','0','5','P','E','N','H','B','D'];
+  const POOL = Array.from(new Set([
+    ...BASE_POOL, ...CONFIG.winWord, ...CONFIG.destWord, ...CONFIG.loseWord1, ...CONFIG.crashWord,
+  ]));
+  const SLIP_CHARS = POOL.filter(c => c !== CONFIG.winWord[2]).slice(0, 4);
 
   const state = {
     busy: false,
@@ -169,6 +219,25 @@
     Object.values(state.reelTimers).forEach(t => clearInterval(t));
     clearInterval(state.chaseTimer);
     clearInterval(state.twitchTimer);
+  }
+
+  /* ---------- static content from CONFIG ---------- */
+  function renderConfig() {
+    $('titleLine1').textContent = CONFIG.titleLine1;
+    $('titleLine2').textContent = CONFIG.titleLine2;
+    $('passPassenger').textContent = CONFIG.passengerName;
+    $('passFromCode').textContent = CONFIG.fromCode;
+    $('passFromCity').textContent = CONFIG.fromCity;
+    $('passToCode').textContent = CONFIG.toCode;
+    $('passToCity').textContent = CONFIG.toCity;
+    $('passDate').textContent = CONFIG.date;
+    $('passDateNote').textContent = CONFIG.dateNote;
+    $('passFlight').textContent = CONFIG.flightNumber;
+    $('passGate').textContent = CONFIG.gate;
+    $('passMessage').textContent = CONFIG.passMessage;
+    $('stubToCode').textContent = CONFIG.toCode;
+    $('stubSeat').textContent = CONFIG.seat;
+    $('stubBoardingTime').textContent = CONFIG.boardingTime;
   }
 
   /* ---------- flap / reels ---------- */
@@ -298,7 +367,7 @@
     if (!top) return;
     top.innerHTML = '';
     state.boardCells = [];
-    ['H','B','D','→','F','U','K'].forEach((ch, idx) => {
+    [...CONFIG.winWord, '→', ...CONFIG.destWord].forEach((ch, idx) => {
       const c = document.createElement('div');
       c.setAttribute('style', boardCellStyle());
       const t = document.createElement('div');
@@ -314,7 +383,7 @@
     const bot = nodes.boardBottom;
     bot.innerHTML = '';
     state.botSpans = [];
-    [`DEP ${DEPART_LABEL}`, 'GATE B7', 'STATUS:'].forEach(txt => {
+    [`DEP ${CONFIG.departLabel}`, `GATE ${CONFIG.gate}`, 'STATUS:'].forEach(txt => {
       const s = document.createElement('span');
       s.textContent = txt;
       s.style.opacity = '0';
@@ -416,27 +485,28 @@
     leverPull();
     caption('', '');
     [0,1,2].forEach(i => startReel(i));
-    await wait(650); stopReel(0, 'N');
-    await wait(420); stopReel(1, 'O');
-    await wait(420); stopReel(2, '!');
+    await wait(650); stopReel(0, CONFIG.loseWord1[0]);
+    await wait(420); stopReel(1, CONFIG.loseWord1[1]);
+    await wait(420); stopReel(2, CONFIG.loseWord1[2]);
     snd('sad');
-    caption(JOKE1, 'meh');
+    caption(CONFIG.joke1, 'meh');
   }
   async function doPull2() {
     leverPull();
     caption('', '');
     [0,1,2].forEach(i => startReel(i));
-    await wait(900); stopReel(0, 'H'); caption('H…', 'win');
-    await wait(700); stopReel(1, 'B'); caption('H B…！', 'win');
+    const [w0, w1, w2] = CONFIG.winWord;
+    await wait(900); stopReel(0, w0); caption(`${w0}…`, 'win');
+    await wait(700); stopReel(1, w1); caption(`${w0} ${w1}…！`, 'win');
     await wait(480);
     clearReel(2);
-    setFlap(2, 'D', true);
-    caption('H B D？！', 'win');
+    setFlap(2, w2, true);
+    caption(`${w0} ${w1} ${w2}？！`, 'win');
     await wait(300);
-    for (const c of ['F','G','K','A']) { setFlap(2, c, true); await wait(115); }
-    stopReel(2, '💩');
+    for (const c of SLIP_CHARS) { setFlap(2, c, true); await wait(115); }
+    stopReel(2, CONFIG.loseSymbol2);
     snd('sad');
-    caption(JOKE2, 'meh');
+    caption(CONFIG.joke2, 'meh');
   }
   async function doPull3() {
     leverPull();
@@ -451,9 +521,9 @@
     nodes.machine.style.filter = 'grayscale(1) brightness(.62)';
     await wait(500);
     twitch(false);
-    setFlap(0, '4', true); setFlap(1, '0', true); setFlap(2, '4', true);
+    setFlap(0, CONFIG.crashWord[0], true); setFlap(1, CONFIG.crashWord[1], true); setFlap(2, CONFIG.crashWord[2], true);
     [0,1,2].forEach(i => { const e = nodes['flap'+i]; if (e) e.style.color = '#FF6161'; });
-    caption('ERR 404 — PRIZE NOT FOUND', 'err');
+    caption(CONFIG.errorCaption, 'err');
     snd('error');
     leverGrey(true);
     await new Promise(r => setTimeout(r, 3000));
@@ -471,7 +541,7 @@
     [0,1,2].forEach(i => { const e = nodes['flap'+i]; if (e) e.style.color = '#FFB627'; setFlap(i, '', false); });
     if (nodes.lightbox) nodes.lightbox.style.boxShadow = '';
     startChase();
-    caption('…系統回復中…', 'meh');
+    caption(CONFIG.rebootCaption, 'meh');
     await wait(1100);
     state.spinCount = 4;
     await doPull4();
@@ -492,15 +562,16 @@
     leverPull();
     await wait(300);
     [0,1,2].forEach(i => startReel(i, true));
-    await wait(900);  stopReel(0, 'H'); shake('light');
-    await wait(700);  stopReel(1, 'B'); shake('med');
+    const [w0, w1, w2] = CONFIG.winWord;
+    await wait(900);  stopReel(0, w0); shake('light');
+    await wait(700);  stopReel(1, w1); shake('med');
     await wait(700);
     clearReel(2);
     await reel2ExtraLoop();
-    stopReel(2, 'D'); shake('big');
+    stopReel(2, w2); shake('big');
     await wait(120);
     climax();
-    caption('H B D 🎂✈', 'win');
+    caption(`${w0} ${w1} ${w2} 🎂✈`, 'win');
     await wait(720);
     await expandToBoard();
     await boardFlipTop();
@@ -538,7 +609,7 @@
     leverGrey(false);
     buildBoard();
     startChase();
-    caption('拉下拉桿，開始你的生日抽獎 🎂', '');
+    caption(CONFIG.idleCaption, '');
   }
   function onSound() {
     state.soundOn = !state.soundOn;
@@ -584,8 +655,9 @@
   nodes.leverKnob.addEventListener('click', onLever);
   nodes.title.addEventListener('click', onTitleTap);
   nodes.soundBtn.addEventListener('click', onSound);
+  renderConfig();
   buildBulbs();
-  caption('拉下拉桿，開始你的生日抽獎 🎂', '');
+  caption(CONFIG.idleCaption, '');
   buildBoard();
   buildBarcode();
   startChase();

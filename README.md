@@ -1,46 +1,99 @@
-# 生日拉霸機 (Birthday Slot Machine)
+# Birthday Slot Machine
 
-一個單頁、手機優先的生日驚喜小遊戲。拉桿拉 4 次，結局完全預先寫死（不是隨機）：
-前三次是搞笑「摃龜」（爛獎、差一點中獎、假當機），第四次中頭獎 **H B D**，
-機台變成機場登機看板，最後滑出一張生日旅行的**登機證**。
+A single-page, mobile-first birthday surprise: a Showa-era slot machine you
+pull 4 times. The outcome is **fully scripted** (not random). The first
+three pulls are gag "losses" (a joke prize, a near-miss, and a fake system
+crash); the fourth pull hits the jackpot, the machine transforms into an
+airport departure board, and a **boarding pass** slides out for a trip.
 
-- 收件人：**YUN YI YANG**
-- 航班：**TPE → FUK**（台北 → 福岡）
-- 日期：**OPEN / 無使用期限**
+Pure vanilla HTML / CSS / JS — zero dependencies, zero build step. It's a
+single `index.html` file.
 
-純 Vanilla HTML / CSS / JS，零依賴、零建置步驟，單一 `index.html` 檔案即可運行。
+## Preview locally
 
-## 本機預覽
-
-不需要安裝任何東西，直接用瀏覽器打開 `index.html`，或起一個簡單的 static server：
+No install needed — just open `index.html` in a browser, or spin up a
+simple static server:
 
 ```bash
 python3 -m http.server 8080
-# 開啟 http://localhost:8080
+# open http://localhost:8080
 ```
 
-## 玩法
+## How it plays
 
-1. 拉下右側拉桿。
-2. 前三拉是安排好的橋段（爛獎 → 差一點中獎 → 假的 `ERR 404` 當機，當機後靜止 3
-   秒是刻意設計，接著會自動重開機並直接進入第 4 拉）。
-3. 第 4 拉中頭獎，機台展開成登機看板，最後滑出登機證。
-4. 連續點擊標題 3 次（1.2 秒內）可以重置整個流程重玩。
-5. 畫面下方有一個 `SOUND OFF/ON` 按鈕，音效預設關閉（用 WebAudio 即時合成，無音檔）。
+1. Pull the lever on the right.
+2. The first three pulls are scripted beats (a joke prize → a near-miss →
+   a fake `ERR 404` crash). The crash is followed by exactly 3 seconds of
+   total silence/stillness — that's intentional, not a bug — then the
+   machine reboots itself and auto-advances into pull 4.
+3. Pull 4 is the jackpot: the machine expands into a departure board, then
+   slides out a boarding pass.
+4. Tap the title 3 times within 1.2s to reset and replay.
+5. A `SOUND OFF/ON` pill at the bottom toggles audio, off by default
+   (synthesized live with WebAudio — no sound files).
 
-## 部署到 Zeabur
+## Making it your own
 
-這是純靜態網站（沒有 `package.json`），Zeabur 的 zbpack 會自動偵測為 Static
-Site，不需要額外設定 build command。
+Everything you'd want to change for a different recipient, trip, or set of
+jokes lives in one `CONFIG` object at the top of the `<script>` block in
+`index.html` — no HTML editing required. Open the file and look for:
 
-1. 到 [dash.zeabur.com](https://dash.zeabur.com) 用 GitHub 帳號登入。
-2. 建立一個新 Project → Add Service → **Deploy from GitHub**。
-3. 若這個 repo 沒出現在清單（因為是 private repo），點清單裡的
-   **"Configure GitHub App"**，到 GitHub 的 App 授權頁把 `slot-machine` 加進
-   Zeabur GitHub App 的 repository access。
-4. 回到 Zeabur 選這個 repo，直接部署，等建置完成即可拿到網址。
+```js
+const CONFIG = {
+  titleLine1: 'BIRTHDAY',
+  titleLine2: 'JACKPOT',
 
-## 檔案
+  idleCaption: '拉下拉桿，開始你的生日抽獎 🎂',
+  rebootCaption: '…系統回復中…',
+  errorCaption: 'ERR 404 — PRIZE NOT FOUND',
 
-- `index.html` — 完整的頁面、樣式與互動邏輯（單檔、無外部 JS 依賴，字型透過
-  Google Fonts CDN 載入：Anton / JetBrains Mono / Noto Sans TC）。
+  loseWord1: ['N', 'O', '!'],       // pull 1 result (exactly 3 chars)
+  joke1: '恭喜獲得：你欠我的那杯珍奶（本人親自兌換）',
+
+  loseSymbol2: '💩',                 // pull 2 near-miss final symbol
+  joke2: '差一個字。獎品：一句「欸差一點欸」',
+
+  crashWord: ['4', '0', '4'],       // pull 3 fake-crash result
+
+  winWord: ['H', 'B', 'D'],         // pull 4 jackpot result (exactly 3 chars)
+  destWord: ['F', 'U', 'K'],        // shown after winWord on the departure board
+  departLabel: 'ANYTIME',
+  gate: 'B7',
+
+  passengerName: 'YUN YI YANG',
+  fromCode: 'TPE',
+  fromCity: '台北桃園',
+  toCode: 'FUK',
+  toCity: '福岡',
+  date: 'OPEN',
+  dateNote: '無使用期限',
+  flightNumber: 'BD-2026',
+  seat: '1A',
+  boardingTime: '09:25',
+  passMessage: '生日快樂。這次換我帶你去。',
+};
+```
+
+Every field is a plain string (or a 3-element array for the reel results —
+`winWord`, `destWord`, `loseWord1`, and `crashWord` must each be exactly 3
+characters/emoji, one per reel). Change the jokes, the prize, the trip, the
+passenger name, whatever — save the file and reload.
+
+## Deploying to Zeabur
+
+This is a static site (no `package.json`), so Zeabur's zbpack auto-detects
+it as a Static Site — no build command needed.
+
+1. Sign in to [dash.zeabur.com](https://dash.zeabur.com) with GitHub.
+2. Create a new Project → Add Service → **Deploy from GitHub**.
+3. If this repo doesn't show up in the list (it's private), click
+   **"Configure GitHub App"** in that list, and on the GitHub authorization
+   page add this repo to the Zeabur GitHub App's repository access.
+4. Back in Zeabur, select the repo and deploy — you'll get a URL once the
+   build finishes.
+
+## Files
+
+- `index.html` — the entire page: markup, styles, and interaction logic in
+  one file (fonts loaded from Google Fonts CDN: Anton / JetBrains Mono /
+  Noto Sans TC).
