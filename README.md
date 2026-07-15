@@ -1,12 +1,14 @@
 # Birthday Slot Machine
 
 A single-page, mobile-first birthday surprise: a Showa-era slot machine.
-Every pull of the lever is a scripted "loss" (a joke prize, a near-miss, a
-fake system crash — looping forever) — the jackpot never happens on its
-own. It only fires when you press a **hidden trigger** (an invisible
-hotspot in the top-right corner of the screen), so whoever's operating the
-machine controls exactly when the machine expands into an airport
-departure board and slides out a **boarding pass** for a trip.
+Every pull of the lever randomly draws 2 real prizes from a configurable
+list (occasionally a near-miss tease or a fake system crash plays
+instead) — the jackpot never happens on its own. It only fires when you
+press a **hidden trigger** (an invisible hotspot in the top-right corner
+of the screen), so whoever's operating the machine controls exactly when
+it expands into an airport departure board and slides out a **boarding
+pass** for a trip. A **🎁 獎品清單** button lets you check everything
+that's been won so far.
 
 Pure vanilla HTML / CSS / JS — zero dependencies, zero build step. It's a
 single `index.html` file.
@@ -23,21 +25,28 @@ python3 -m http.server 8080
 
 ## How it plays
 
-1. Pull the lever on the right — it always loses. It cycles through a set
-   of scripted beats forever, looping back to the start: a joke prize → a
-   near-miss → a fake `ERR 404` system crash (followed by exactly 3
-   seconds of total silence/stillness — intentional, not a bug — then the
-   machine reboots itself and is ready for another pull).
-2. To make the jackpot happen, tap the **invisible button in the top-right
+1. Pull the lever on the right — it always loses, but usually not empty
+   handed. Each pull randomly draws **2 distinct prizes** from the prize
+   list (no repeats within one draw) and adds them to the 🎁 獎品清單.
+   There's no fixed order — it's a fresh random draw every time.
+2. Occasionally (25% of pulls by default, split evenly) a near-miss tease
+   or a fake `ERR 404` system crash plays instead of a prize draw. The
+   crash is followed by exactly 3 seconds of total silence/stillness —
+   intentional, not a bug — then the machine reboots itself and is ready
+   for another pull.
+3. Tap **🎁 獎品清單** (bottom-right) any time to see everything won so
+   far this session, tallied by prize.
+4. To make the jackpot happen, tap the **invisible button in the top-right
    corner of the screen** (a 72×72px hotspot, `#secretBtn` in the HTML —
    there's nothing to see, you just have to know it's there). The machine
    expands into a departure board, then slides out a boarding pass.
-   - If you tap it while a loss is still playing out, it doesn't cut the
-     animation off — the jackpot plays right after that loss finishes.
+   - If you tap it while a draw is still playing out, it doesn't cut the
+     animation off — the jackpot plays right after that draw finishes.
    - Once the jackpot has played, the lever and the hidden trigger both go
      quiet until you reset.
-3. Tap the title 3 times within 1.2s to reset and replay from the top.
-4. A `SOUND OFF/ON` pill at the bottom toggles audio, off by default
+5. Tap the title 3 times within 1.2s to reset and replay from the top
+   (this also clears the 獎品清單).
+6. A `SOUND OFF/ON` pill at the bottom toggles audio, off by default
    (synthesized live with WebAudio — no sound files).
 
 ## Making it your own
@@ -54,21 +63,24 @@ const CONFIG = {
   idleCaption: '拉下拉桿，開始你的生日抽獎 🎂',
   rebootCaption: '…系統回復中…',
 
-  // The lever cycles through these forever (loops back to index 0).
-  // type: 'plain' (reels land on `word`) | 'tease' (reels tease winWord,
-  // then slip to `symbol`) | 'crash' (fake system crash + reboot).
-  losses: [
-    { type: 'plain', word: ['💆','💆','💆'], caption: '恭喜獲得：按摩券一張' },
-    { type: 'plain', word: ['🧼','🧼','🧼'], caption: '恭喜獲得：洗碗券一張' },
-    { type: 'plain', word: ['🎂','🎂','🎂'], caption: '恭喜獲得：楊寶春一個' },
-    { type: 'plain', word: ['🍞','🍞','🍞'], caption: '恭喜獲得：麵包一個' },
-    { type: 'tease', symbol: '💩', caption: '差一個字。獎品：一句「欸差一點欸」' },
-    { type: 'plain', word: ['🍳','🍳','🍳'], caption: '恭喜獲得：煮飯券一張' },
-    { type: 'plain', word: ['🧋','🧋','🧋'], caption: '恭喜獲得：珍奶一杯' },
-    { type: 'plain', word: ['📖','📖','📖'], caption: '恭喜獲得：my book 兌換券一本' },
-    { type: 'plain', word: ['🍚','🍚','🍚'], caption: '恭喜獲得：肉燥飯一碗' },
-    { type: 'crash', word: ['4', '0', '4'], caption: 'ERR 404 — PRIZE NOT FOUND' },
+  // Real prizes — each pull randomly draws 2 of these (no repeats within
+  // a single draw) and logs them to the 獎品清單.
+  prizes: [
+    { emoji: '💆', label: '按摩券一張' },
+    { emoji: '🧼', label: '洗碗券一張' },
+    { emoji: '🎂', label: '楊寶春一個' },
+    { emoji: '🍞', label: '麵包一個' },
+    { emoji: '🍳', label: '煮飯券一張' },
+    { emoji: '🧋', label: '珍奶一杯' },
+    { emoji: '📖', label: 'my book 兌換券一本' },
+    { emoji: '🍚', label: '肉燥飯一碗' },
   ],
+
+  // Chance (0–1) that a pull is a special event instead of a prize draw,
+  // split evenly between the near-miss tease and the fake crash.
+  specialEventChance: 0.25,
+  tease: { symbol: '💩', caption: '差一個字。獎品：一句「欸差一點欸」' },
+  crash: { word: ['4', '0', '4'], caption: 'ERR 404 — PRIZE NOT FOUND' },
 
   winWord: ['H', 'B', 'D'],         // jackpot result (exactly 3 chars), only reachable via the hidden trigger
   destWord: ['F', 'U', 'K'],        // shown after winWord on the departure board
@@ -89,11 +101,12 @@ const CONFIG = {
 };
 ```
 
-`winWord`, `destWord`, and every `word` in `losses` must be exactly 3
-characters/emoji (one per reel). Add, remove, or reorder entries in
-`losses` freely — the cycle length adjusts automatically. Change the
-jokes, the prize, the trip, the passenger name, whatever — save the file
-and reload.
+`winWord`, `destWord`, and `crash.word` must be exactly 3 characters (one
+per reel). Add, remove, or edit entries in `prizes` freely — the draw pool
+adjusts automatically (needs at least 2 entries, since every draw picks 2).
+Each prize just needs an `emoji` (shown on 2 of the 3 reels, joined by a
+`+`) and a `label` (the full text, any length). Change the prizes, the
+trip, the passenger name, whatever — save the file and reload.
 
 Want the hidden trigger somewhere other than the top-right corner? It's
 the `#secretBtn` element right after the `SOUND OFF` button in the HTML —

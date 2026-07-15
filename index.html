@@ -125,8 +125,21 @@
 
   <button id="soundBtn" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 8; background: rgba(20,24,29,.85); color: #9a9488; border: 1px solid #2b2f34; border-radius: 22px; padding: 9px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px; cursor: pointer;">🔇 SOUND OFF</button>
 
+  <button id="prizeListBtn" style="position: absolute; bottom: 20px; right: 16px; z-index: 8; background: rgba(20,24,29,.85); color: #9a9488; border: 1px solid #2b2f34; border-radius: 22px; padding: 9px 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px; cursor: pointer;">🎁 獎品清單</button>
+
   <!-- Hidden jackpot trigger: invisible hotspot, top-right corner of the screen. See README. -->
   <button id="secretBtn" aria-hidden="true" tabindex="-1" style="position: fixed; top: 0; right: 0; width: 72px; height: 72px; z-index: 9; background: transparent; border: none; padding: 0; margin: 0; cursor: default; -webkit-tap-highlight-color: transparent;"></button>
+
+  <!-- Prize list modal -->
+  <div id="prizeModal" style="position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.6); display: none; align-items: center; justify-content: center; padding: 24px;">
+    <div style="width: min(92vw, 380px); max-height: 78vh; overflow-y: auto; background: #14181d; border: 2px solid #2b2f34; border-radius: 14px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,.6);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+        <div style="font-family: 'Anton', sans-serif; color: #FFB627; letter-spacing: 1px; font-size: 20px;">🎁 中獎清單</div>
+        <button id="prizeCloseBtn" style="background: none; border: none; color: #9a9488; font-size: 20px; line-height: 1; padding: 4px; cursor: pointer;">✕</button>
+      </div>
+      <div id="prizeListContent"></div>
+    </div>
+  </div>
 
 </div>
 
@@ -137,14 +150,18 @@
    * trip, or set of jokes lives here. Nothing below this block needs to
    * be touched for a re-skin.
    *
-   * The lever always loses — it cycles through `losses` forever, looping
-   * back to the start. The jackpot never happens on its own; it only
+   * The lever always loses — each pull randomly draws 2 distinct prizes
+   * from `prizes` (no fixed order, no repeats within one draw) and adds
+   * them to the on-screen "🎁 獎品清單". Occasionally, instead of a prize
+   * draw, a near-miss tease or a fake system crash plays instead (see
+   * `specialEventChance`). The jackpot never happens on its own; it only
    * fires when the hidden trigger (invisible button, top-right corner of
    * the screen — see README) is pressed. If pressed mid-spin, the jackpot
-   * plays right after the current loss finishes instead of cutting it off.
+   * plays right after the current draw finishes instead of cutting it off.
    *
-   * winWord / destWord and every `word` in `losses` must be exactly 3
-   * characters (or emoji) — they're rendered one-per-reel.
+   * winWord / destWord and crash.word must be exactly 3 characters (or
+   * emoji) — they're rendered one-per-reel. Each prize's `emoji` fills
+   * two of the three reels (joined by a "+") when it's drawn.
    * ===================================================================== */
   const CONFIG = {
     // Title plate (two lines)
@@ -155,22 +172,24 @@
     idleCaption: '拉下拉桿，開始你的生日抽獎 🎂',
     rebootCaption: '…系統回復中…',
 
-    // Losses the lever cycles through forever (loops back to index 0).
-    // type: 'plain' (reels land directly on `word`) | 'tease' (reels tease
-    // winWord then slip to `symbol`) | 'crash' (fake system crash, 3s
-    // silence, reboot). `caption` is shown once the reels stop.
-    losses: [
-      { type: 'plain', word: ['💆','💆','💆'], caption: '恭喜獲得：按摩券一張' },
-      { type: 'plain', word: ['🧼','🧼','🧼'], caption: '恭喜獲得：洗碗券一張' },
-      { type: 'plain', word: ['🎂','🎂','🎂'], caption: '恭喜獲得：楊寶春一個' },
-      { type: 'plain', word: ['🍞','🍞','🍞'], caption: '恭喜獲得：麵包一個' },
-      { type: 'tease', symbol: '💩', caption: '差一個字。獎品：一句「欸差一點欸」' },
-      { type: 'plain', word: ['🍳','🍳','🍳'], caption: '恭喜獲得：煮飯券一張' },
-      { type: 'plain', word: ['🧋','🧋','🧋'], caption: '恭喜獲得：珍奶一杯' },
-      { type: 'plain', word: ['📖','📖','📖'], caption: '恭喜獲得：my book 兌換券一本' },
-      { type: 'plain', word: ['🍚','🍚','🍚'], caption: '恭喜獲得：肉燥飯一碗' },
-      { type: 'crash', word: ['4', '0', '4'], caption: 'ERR 404 — PRIZE NOT FOUND' },
+    // Real prizes — each pull randomly draws 2 of these (no repeats within
+    // a single draw) and logs them to the 獎品清單.
+    prizes: [
+      { emoji: '💆', label: '按摩券一張' },
+      { emoji: '🧼', label: '洗碗券一張' },
+      { emoji: '🎂', label: '楊寶春一個' },
+      { emoji: '🍞', label: '麵包一個' },
+      { emoji: '🍳', label: '煮飯券一張' },
+      { emoji: '🧋', label: '珍奶一杯' },
+      { emoji: '📖', label: 'my book 兌換券一本' },
+      { emoji: '🍚', label: '肉燥飯一碗' },
     ],
+
+    // Chance (0–1) that a pull is a special event instead of a prize draw.
+    // Split evenly between the near-miss tease and the fake crash.
+    specialEventChance: 0.25,
+    tease: { symbol: '💩', caption: '差一個字。獎品：一句「欸差一點欸」' },
+    crash: { word: ['4', '0', '4'], caption: 'ERR 404 — PRIZE NOT FOUND' },
 
     // Jackpot (only reachable via the hidden trigger). Reels land on winWord.
     winWord: ['H', 'B', 'D'],
@@ -200,22 +219,21 @@
     marquee: $('marquee'), caption: $('caption'), leverKnob: $('leverKnob'),
     board: $('board'), boardTop: $('boardTop'), boardBottom: $('boardBottom'),
     pass: $('pass'), barcode: $('barcode'), soundBtn: $('soundBtn'), secretBtn: $('secretBtn'),
+    prizeListBtn: $('prizeListBtn'), prizeModal: $('prizeModal'), prizeListContent: $('prizeListContent'), prizeCloseBtn: $('prizeCloseBtn'),
     flap0: $('flap0'), flap1: $('flap1'), flap2: $('flap2'),
     cell0: $('cell0'), cell1: $('cell1'), cell2: $('cell2'),
   };
 
   const rm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const BASE_POOL = ['A','K','U','F','8','2','6','9','T','G','0','5','P','E','N','H','B','D'];
-  const LOSS_CHARS = CONFIG.losses.flatMap(l => l.word || []);
   const POOL = Array.from(new Set([
-    ...BASE_POOL, ...CONFIG.winWord, ...CONFIG.destWord, ...LOSS_CHARS,
+    ...BASE_POOL, ...CONFIG.winWord, ...CONFIG.destWord, ...CONFIG.crash.word,
   ]));
   const SLIP_CHARS = POOL.filter(c => c !== CONFIG.winWord[2]).slice(0, 4);
 
   const state = {
     busy: false,
     leverDisabled: false,
-    pullIndex: 0,
     pendingJackpot: false,
     gameOver: false,
     soundOn: false,
@@ -229,6 +247,7 @@
     boardCells: [],
     botSpans: [],
     boardingSpan: null,
+    wonPrizes: [],
   };
 
   function wait(ms) { return new Promise(r => setTimeout(r, rm ? Math.round(ms * 0.6) : ms)); }
@@ -375,6 +394,44 @@
     el.style.textShadow = mode === 'win' ? '0 0 12px rgba(255,182,39,.6)' : 'none';
   }
 
+  /* ---------- prize list ---------- */
+  function renderPrizeList() {
+    const container = nodes.prizeListContent;
+    if (!container) return;
+    container.innerHTML = '';
+    if (state.wonPrizes.length === 0) {
+      const empty = document.createElement('div');
+      empty.textContent = '還沒中獎，快去拉拉桿！';
+      empty.style.cssText = "font-family:'Noto Sans TC',sans-serif;font-size:14px;color:#9a9488;padding:12px 0;";
+      container.appendChild(empty);
+      return;
+    }
+    const order = [];
+    const seen = new Set();
+    const tally = new Map();
+    state.wonPrizes.forEach(p => {
+      tally.set(p.label, (tally.get(p.label) || 0) + 1);
+      if (!seen.has(p.label)) { seen.add(p.label); order.push(p); }
+    });
+    order.forEach(p => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);';
+      const emojiEl = document.createElement('span');
+      emojiEl.textContent = p.emoji;
+      emojiEl.style.fontSize = '22px';
+      const labelEl = document.createElement('span');
+      labelEl.textContent = p.label;
+      labelEl.style.cssText = "flex:1;font-family:'Noto Sans TC',sans-serif;font-size:14px;color:#EDE7DA;";
+      const countEl = document.createElement('span');
+      countEl.textContent = `×${tally.get(p.label)}`;
+      countEl.style.cssText = "font-family:'JetBrains Mono',monospace;font-weight:700;color:#FFB627;";
+      row.appendChild(emojiEl); row.appendChild(labelEl); row.appendChild(countEl);
+      container.appendChild(row);
+    });
+  }
+  function openPrizeModal() { nodes.prizeModal.style.display = 'flex'; renderPrizeList(); }
+  function closePrizeModal() { nodes.prizeModal.style.display = 'none'; }
+
   /* ---------- board build ---------- */
   function boardCellStyle() {
     return 'position:relative;width:clamp(38px,11vw,54px);height:clamp(54px,15vw,74px);background:#101317;border:1px solid #000;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;perspective:340px;box-shadow:inset 0 3px 8px rgba(0,0,0,.85);font-family:JetBrains Mono,monospace;font-weight:700;font-size:clamp(26px,7vw,40px);color:#FFB627;';
@@ -497,18 +554,30 @@
     snd('ding2');
   }
 
-  /* ---------- loss pulls (cycle forever) ---------- */
-  async function doPlainLoss(entry) {
-    [0,1,2].forEach(i => startReel(i));
-    await wait(650); stopReel(0, entry.word[0]);
-    await wait(420); stopReel(1, entry.word[1]);
-    await wait(420); stopReel(2, entry.word[2]);
-    snd('sad');
-    caption(entry.caption, 'meh');
+  /* ---------- loss pulls (random each time) ---------- */
+  function pickTwoPrizes() {
+    const idxs = CONFIG.prizes.map((_, i) => i);
+    for (let i = idxs.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+    }
+    return [CONFIG.prizes[idxs[0]], CONFIG.prizes[idxs[1]]];
   }
-  async function doTeaseLoss(entry) {
+  async function doPrizeDraw() {
+    const [a, b] = pickTwoPrizes();
     [0,1,2].forEach(i => startReel(i));
-    const [w0, w1, w2] = entry.word || CONFIG.winWord;
+    await wait(650); stopReel(0, a.emoji);
+    await wait(420); stopReel(1, '+');
+    await wait(420); stopReel(2, b.emoji);
+    snd('sad');
+    caption(`恭喜獲得：${a.label}、${b.label}`, 'meh');
+    state.wonPrizes.push(a, b);
+    if (nodes.prizeModal.style.display !== 'none') renderPrizeList();
+  }
+  async function doTeaseLoss() {
+    const entry = CONFIG.tease;
+    [0,1,2].forEach(i => startReel(i));
+    const [w0, w1, w2] = CONFIG.winWord;
     await wait(900); stopReel(0, w0); caption(`${w0}…`, 'win');
     await wait(700); stopReel(1, w1); caption(`${w0} ${w1}…！`, 'win');
     await wait(480);
@@ -521,7 +590,8 @@
     snd('sad');
     caption(entry.caption, 'meh');
   }
-  async function doCrashLoss(entry) {
+  async function doCrashLoss() {
+    const entry = CONFIG.crash;
     [0,1,2].forEach(i => startReel(i));
     await wait(800);
     [0,1,2].forEach(i => clearReel(i));
@@ -556,13 +626,12 @@
     await wait(900);
   }
   async function doLossPull() {
-    const entry = CONFIG.losses[state.pullIndex % CONFIG.losses.length];
-    state.pullIndex++;
     leverPull();
     caption('', '');
-    if (entry.type === 'crash') await doCrashLoss(entry);
-    else if (entry.type === 'tease') await doTeaseLoss(entry);
-    else await doPlainLoss(entry);
+    const r = Math.random();
+    if (r < CONFIG.specialEventChance / 2) await doCrashLoss();
+    else if (r < CONFIG.specialEventChance) await doTeaseLoss();
+    else await doPrizeDraw();
   }
 
   /* ---------- jackpot (only via the hidden trigger) ---------- */
@@ -601,7 +670,7 @@
     state.gameOver = true;
   }
 
-  /* ---------- pull dispatcher: losses forever, jackpot only when triggered ---------- */
+  /* ---------- pull dispatcher: random draws forever, jackpot only when triggered ---------- */
   async function runPull() {
     if (state.pendingJackpot) {
       state.pendingJackpot = false;
@@ -640,7 +709,7 @@
   function reset() {
     clearAllTimers();
     state.busy = false; state.leverDisabled = false; state.gameOver = false;
-    state.pendingJackpot = false; state.pullIndex = 0; state.climaxOn = false;
+    state.pendingJackpot = false; state.climaxOn = false; state.wonPrizes = [];
     state.reelIdx = { 0: 0, 1: 0, 2: 0 };
     const m = nodes.machine;
     m.style.display = ''; m.style.transition = 'none'; m.style.opacity = '1'; m.style.transform = 'none'; m.style.filter = 'none'; m.style.animation = 'none';
@@ -652,6 +721,7 @@
     buildBoard();
     startChase();
     caption(CONFIG.idleCaption, '');
+    if (nodes.prizeModal.style.display !== 'none') renderPrizeList();
   }
   function onSound() {
     state.soundOn = !state.soundOn;
@@ -698,6 +768,9 @@
   nodes.title.addEventListener('click', onTitleTap);
   nodes.soundBtn.addEventListener('click', onSound);
   nodes.secretBtn.addEventListener('click', onSecret);
+  nodes.prizeListBtn.addEventListener('click', openPrizeModal);
+  nodes.prizeCloseBtn.addEventListener('click', closePrizeModal);
+  nodes.prizeModal.addEventListener('click', (e) => { if (e.target === nodes.prizeModal) closePrizeModal(); });
   renderConfig();
   buildBulbs();
   caption(CONFIG.idleCaption, '');
