@@ -162,6 +162,10 @@
    * winWord / destWord and crash.word must be exactly 3 characters (or
    * emoji) — they're rendered one-per-reel. Each prize's `emoji` fills
    * two of the three reels (joined by a "+") when it's drawn.
+   *
+   * A prize can carry an optional `stock` (a limited-quantity prize) — once
+   * it's been drawn `stock` times total, it stops appearing in future draws
+   * for the rest of the session. Omit `stock` for an unlimited prize.
    * ===================================================================== */
   const CONFIG = {
     // Title plate (two lines)
@@ -183,6 +187,7 @@
       { emoji: '🧋', label: '珍奶一杯' },
       { emoji: '📖', label: 'my book 兌換券一本' },
       { emoji: '🍚', label: '肉燥飯一碗' },
+      { emoji: '📛', label: '黃嘟嘟為你取名頂級券', stock: 3 },
     ],
 
     // Chance (0–1) that a pull is a special event instead of a prize draw.
@@ -230,6 +235,7 @@
     ...BASE_POOL, ...CONFIG.winWord, ...CONFIG.destWord, ...CONFIG.crash.word,
   ]));
   const SLIP_CHARS = POOL.filter(c => c !== CONFIG.winWord[2]).slice(0, 4);
+  const PRIZE_BY_LABEL = new Map(CONFIG.prizes.map(p => [p.label, p]));
 
   const state = {
     busy: false,
@@ -248,7 +254,19 @@
     botSpans: [],
     boardingSpan: null,
     wonPrizes: [],
+    remainingStock: {},
   };
+
+  function initStock() {
+    state.remainingStock = {};
+    CONFIG.prizes.forEach(p => { if (p.stock != null) state.remainingStock[p.label] = p.stock; });
+  }
+  function availablePrizes() {
+    return CONFIG.prizes.filter(p => p.stock == null || state.remainingStock[p.label] > 0);
+  }
+  function consumeStock(p) {
+    if (p.stock != null) state.remainingStock[p.label] = Math.max(0, state.remainingStock[p.label] - 1);
+  }
 
   function wait(ms) { return new Promise(r => setTimeout(r, rm ? Math.round(ms * 0.6) : ms)); }
   function clearAllTimers() {
@@ -414,18 +432,29 @@
       if (!seen.has(p.label)) { seen.add(p.label); order.push(p); }
     });
     order.forEach(p => {
+      const def = PRIZE_BY_LABEL.get(p.label);
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);';
       const emojiEl = document.createElement('span');
       emojiEl.textContent = p.emoji;
       emojiEl.style.fontSize = '22px';
-      const labelEl = document.createElement('span');
+      const labelWrap = document.createElement('div');
+      labelWrap.style.flex = '1';
+      const labelEl = document.createElement('div');
       labelEl.textContent = p.label;
-      labelEl.style.cssText = "flex:1;font-family:'Noto Sans TC',sans-serif;font-size:14px;color:#EDE7DA;";
+      labelEl.style.cssText = "font-family:'Noto Sans TC',sans-serif;font-size:14px;color:#EDE7DA;";
+      labelWrap.appendChild(labelEl);
+      if (def && def.stock != null) {
+        const remaining = state.remainingStock[p.label] ?? 0;
+        const stockEl = document.createElement('div');
+        stockEl.textContent = remaining > 0 ? `限量款，剩 ${remaining} 份` : '限量款，已送完';
+        stockEl.style.cssText = "font-family:'Noto Sans TC',sans-serif;font-size:11px;color:#9a9488;margin-top:2px;";
+        labelWrap.appendChild(stockEl);
+      }
       const countEl = document.createElement('span');
       countEl.textContent = `×${tally.get(p.label)}`;
       countEl.style.cssText = "font-family:'JetBrains Mono',monospace;font-weight:700;color:#FFB627;";
-      row.appendChild(emojiEl); row.appendChild(labelEl); row.appendChild(countEl);
+      row.appendChild(emojiEl); row.appendChild(labelWrap); row.appendChild(countEl);
       container.appendChild(row);
     });
   }
@@ -556,15 +585,17 @@
 
   /* ---------- loss pulls (random each time) ---------- */
   function pickTwoPrizes() {
-    const idxs = CONFIG.prizes.map((_, i) => i);
+    const pool = availablePrizes();
+    const idxs = pool.map((_, i) => i);
     for (let i = idxs.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
     }
-    return [CONFIG.prizes[idxs[0]], CONFIG.prizes[idxs[1]]];
+    return [pool[idxs[0]], pool[idxs[1]]];
   }
   async function doPrizeDraw() {
     const [a, b] = pickTwoPrizes();
+    consumeStock(a); consumeStock(b);
     [0,1,2].forEach(i => startReel(i));
     await wait(650); stopReel(0, a.emoji);
     await wait(420); stopReel(1, '+');
@@ -711,6 +742,7 @@
     state.busy = false; state.leverDisabled = false; state.gameOver = false;
     state.pendingJackpot = false; state.climaxOn = false; state.wonPrizes = [];
     state.reelIdx = { 0: 0, 1: 0, 2: 0 };
+    initStock();
     const m = nodes.machine;
     m.style.display = ''; m.style.transition = 'none'; m.style.opacity = '1'; m.style.transform = 'none'; m.style.filter = 'none'; m.style.animation = 'none';
     if (nodes.lightbox) nodes.lightbox.style.boxShadow = '';
@@ -771,6 +803,7 @@
   nodes.prizeListBtn.addEventListener('click', openPrizeModal);
   nodes.prizeCloseBtn.addEventListener('click', closePrizeModal);
   nodes.prizeModal.addEventListener('click', (e) => { if (e.target === nodes.prizeModal) closePrizeModal(); });
+  initStock();
   renderConfig();
   buildBulbs();
   caption(CONFIG.idleCaption, '');

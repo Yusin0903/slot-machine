@@ -64,7 +64,8 @@ const CONFIG = {
   rebootCaption: '…系統回復中…',
 
   // Real prizes — each pull randomly draws 2 of these (no repeats within
-  // a single draw) and logs them to the 獎品清單.
+  // a single draw) and logs them to the 獎品清單. A prize with `stock`
+  // stops being drawn once it's been won that many times total.
   prizes: [
     { emoji: '💆', label: '按摩券一張' },
     { emoji: '🧼', label: '洗碗券一張' },
@@ -74,6 +75,7 @@ const CONFIG = {
     { emoji: '🧋', label: '珍奶一杯' },
     { emoji: '📖', label: 'my book 兌換券一本' },
     { emoji: '🍚', label: '肉燥飯一碗' },
+    { emoji: '📛', label: '黃嘟嘟為你取名頂級券', stock: 3 },  // limited: only 3 in the whole session
   ],
 
   // Chance (0–1) that a pull is a special event instead of a prize draw,
@@ -103,10 +105,13 @@ const CONFIG = {
 
 `winWord`, `destWord`, and `crash.word` must be exactly 3 characters (one
 per reel). Add, remove, or edit entries in `prizes` freely — the draw pool
-adjusts automatically (needs at least 2 entries, since every draw picks 2).
-Each prize just needs an `emoji` (shown on 2 of the 3 reels, joined by a
-`+`) and a `label` (the full text, any length). Change the prizes, the
-trip, the passenger name, whatever — save the file and reload.
+adjusts automatically (needs at least 2 entries with stock left, since
+every draw picks 2). Each prize just needs an `emoji` (shown on 2 of the 3
+reels, joined by a `+`) and a `label` (the full text, any length); add
+`stock: N` to cap how many times a prize can ever be won in one session —
+once it's out, it silently stops appearing in draws and the 獎品清單 shows
+"限量款，已送完" next to it. Change the prizes, the trip, the passenger
+name, whatever — save the file and reload.
 
 Want the hidden trigger somewhere other than the top-right corner? It's
 the `#secretBtn` element right after the `SOUND OFF` button in the HTML —
