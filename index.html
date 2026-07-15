@@ -150,18 +150,18 @@
    * trip, or set of jokes lives here. Nothing below this block needs to
    * be touched for a re-skin.
    *
-   * The lever always loses — each pull randomly draws 2 distinct prizes
-   * from `prizes` (no fixed order, no repeats within one draw) and adds
-   * them to the on-screen "🎁 獎品清單". Occasionally, instead of a prize
-   * draw, a near-miss tease or a fake system crash plays instead (see
-   * `specialEventChance`). The jackpot never happens on its own; it only
-   * fires when the hidden trigger (invisible button, top-right corner of
-   * the screen — see README) is pressed. If pressed mid-spin, the jackpot
-   * plays right after the current draw finishes instead of cutting it off.
+   * The lever always loses — each pull randomly draws 1 prize from
+   * `prizes` (no fixed order) and adds it to the on-screen "🎁 獎品清單".
+   * Occasionally, instead of a prize draw, a near-miss tease or a fake
+   * system crash plays instead (see `specialEventChance`). The jackpot
+   * never happens on its own; it only fires when the hidden trigger
+   * (invisible button, top-right corner of the screen — see README) is
+   * pressed. If pressed mid-spin, the jackpot plays right after the
+   * current draw finishes instead of cutting it off.
    *
    * winWord / destWord and crash.word must be exactly 3 characters (or
    * emoji) — they're rendered one-per-reel. Each prize's `emoji` fills
-   * two of the three reels (joined by a "+") when it's drawn.
+   * all three reels when it's drawn.
    *
    * A prize can carry an optional `stock` (a limited-quantity prize) — once
    * it's been drawn `stock` times total, it stops appearing in future draws
@@ -588,25 +588,20 @@
   }
 
   /* ---------- loss pulls (random each time) ---------- */
-  function pickTwoPrizes() {
+  function pickOnePrize() {
     const pool = availablePrizes();
-    const idxs = pool.map((_, i) => i);
-    for (let i = idxs.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
-    }
-    return [pool[idxs[0]], pool[idxs[1]]];
+    return pool[Math.floor(Math.random() * pool.length)];
   }
   async function doPrizeDraw() {
-    const [a, b] = pickTwoPrizes();
-    consumeStock(a); consumeStock(b);
+    const a = pickOnePrize();
+    consumeStock(a);
     [0,1,2].forEach(i => startReel(i));
     await wait(650); stopReel(0, a.emoji);
-    await wait(420); stopReel(1, '+');
-    await wait(420); stopReel(2, b.emoji);
+    await wait(420); stopReel(1, a.emoji);
+    await wait(420); stopReel(2, a.emoji);
     snd('sad');
-    caption(`恭喜獲得：${a.label}、${b.label}`, 'meh');
-    state.wonPrizes.push(a, b);
+    caption(`恭喜獲得：${a.label}`, 'meh');
+    state.wonPrizes.push(a);
     if (nodes.prizeModal.style.display !== 'none') renderPrizeList();
   }
   async function doTeaseLoss() {
@@ -675,7 +670,7 @@
   async function doLossPull() {
     leverPull();
     caption('', '');
-    if (availablePrizes().length < 2) { await doSoldOut(); return; }
+    if (availablePrizes().length < 1) { await doSoldOut(); return; }
     const r = Math.random();
     if (r < CONFIG.specialEventChance / 2) await doCrashLoss();
     else if (r < CONFIG.specialEventChance) await doTeaseLoss();

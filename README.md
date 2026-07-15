@@ -26,9 +26,9 @@ python3 -m http.server 8080
 ## How it plays
 
 1. Pull the lever on the right — it always loses, but usually not empty
-   handed. Each pull randomly draws **2 distinct prizes** from the prize
-   list (no repeats within one draw) and adds them to the 🎁 獎品清單.
-   There's no fixed order — it's a fresh random draw every time.
+   handed. Each pull randomly draws **1 prize** from the prize list and
+   adds it to the 🎁 獎品清單. There's no fixed order — it's a fresh
+   random draw every time.
 2. Occasionally (25% of pulls by default, split evenly) a near-miss tease
    or a fake `ERR 404` system crash plays instead of a prize draw. The
    crash is followed by exactly 3 seconds of total silence/stillness —
@@ -63,9 +63,9 @@ const CONFIG = {
   idleCaption: '拉下拉桿，開始你的生日抽獎 🎂',
   rebootCaption: '…系統回復中…',
 
-  // Real prizes — each pull randomly draws 2 of these (no repeats within
-  // a single draw) and logs them to the 獎品清單. A prize with `stock`
-  // stops being drawn once it's been won that many times total.
+  // Real prizes — each pull randomly draws 1 of these and logs it to the
+  // 獎品清單. A prize with `stock` stops being drawn once it's been won
+  // that many times total.
   prizes: [
     { emoji: '💆', label: '按摩券一張' },
     { emoji: '🧼', label: '洗碗券一張' },
@@ -109,17 +109,17 @@ const CONFIG = {
 
 `winWord`, `destWord`, and `crash.word` must be exactly 3 characters (one
 per reel). Add, remove, or edit entries in `prizes` freely — the draw pool
-adjusts automatically (needs at least 2 entries with stock left, since
-every draw picks 2). Each prize just needs an `emoji` (shown on 2 of the 3
-reels, joined by a `+`) and a `label` (the full text, any length); add
-`stock: N` to cap how many times a prize can ever be won in one session —
-once it's out, it silently stops appearing in draws and the 獎品清單 shows
-"限量款，已送完" next to it. If you cap enough prizes that fewer than 2
-are left with stock (e.g. you give every prize a `stock`), the machine
-shows an `ERR 404 — 獎品沒了` sold-out message on every pull instead of
-drawing — right now only `黃嘟嘟為你取名頂級券` is capped, so this state
-isn't reachable unless you add `stock` to more prizes too. Change the
-prizes, the trip, the passenger name, whatever — save the file and reload.
+adjusts automatically (needs at least 1 entry with stock left). Each prize
+just needs an `emoji` (fills all 3 reels when drawn) and a `label` (the
+full text, any length); add `stock: N` to cap how many times a prize can
+ever be won in one session — once it's out, it silently stops appearing in
+draws and the 獎品清單 shows "限量款，已送完" next to it. If you cap
+enough prizes that none are left with stock (e.g. you give every prize a
+`stock`), the machine shows an `ERR 404 — 獎品沒了` sold-out message on
+every pull instead of drawing — right now only `黃嘟嘟為你取名頂級券` is
+capped, so this state isn't reachable unless you add `stock` to more
+prizes too. Change the prizes, the trip, the passenger name, whatever —
+save the file and reload.
 
 Want the hidden trigger somewhere other than the top-right corner? It's
 the `#secretBtn` element right after the `SOUND OFF` button in the HTML —
