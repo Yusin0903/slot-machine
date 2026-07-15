@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIRTHDAY JACKPOT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@700&family=Noto+Sans+TC:wght@400;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: #07090b; -webkit-font-smoothing: antialiased; }
+  a { color: #C89B3C; }
+  a:hover { color: #FFB627; }
+  @keyframes flap { from { transform: rotateX(-90deg); opacity: .35; } to { transform: rotateX(0); opacity: 1; } }
+  @keyframes shk { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-4px) rotate(-.4deg); } 60% { transform: translateX(4px) rotate(.4deg); } }
+  @keyframes shkBig { 0%,100% { transform: translate(0,0); } 15% { transform: translate(-8px,3px) rotate(-.8deg); } 45% { transform: translate(8px,-3px) rotate(.8deg); } 75% { transform: translate(-5px,2px); } }
+  @keyframes confetti { to { transform: translateY(112vh) rotate(760deg); opacity: .85; } }
+  @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: .18; } }
+  @keyframes washpulse { 0% { opacity: 0; } 30% { opacity: .55; } 100% { opacity: 0; } }
+</style>
+</head>
+<body>
+
+<div id="stage" style="position: relative; width: 100%; min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 26px 16px 96px; overflow: hidden; background: radial-gradient(120% 90% at 50% 8%, #14181d 0%, #0a0c0f 55%, #06070a 100%); font-family: 'Noto Sans TC', sans-serif;">
+
+  <div id="machine" style="width: min(92vw, 420px); position: relative; z-index: 2;">
+
+    <div id="lightbox" style="background: linear-gradient(#c8a44a, #9a751f); border-radius: 20px 20px 6px 6px; padding: 12px 14px 14px; box-shadow: 0 6px 0 #6f5416, 0 12px 24px rgba(0,0,0,.5), inset 0 2px 0 rgba(255,255,255,.35); border: 2px solid #6f5416;">
+      <div id="marquee" style="display: flex; justify-content: center; gap: 8px; padding: 4px 4px 10px;"></div>
+      <div id="title" style="background: #7a1a22; border-radius: 8px; border: 2px solid #5a1119; padding: 10px 8px 8px; text-align: center; cursor: pointer; box-shadow: inset 0 2px 8px rgba(0,0,0,.6); user-select: none;">
+        <div style="font-family: 'Anton', sans-serif; color: #FFB627; letter-spacing: 2px; line-height: .92; font-size: clamp(26px, 8vw, 38px); text-shadow: 0 0 10px rgba(255,182,39,.5), 0 2px 0 #3a0d12;">BIRTHDAY<br>JACKPOT</div>
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(#B3202C, #8f1822); border: 2px solid #6f5416; border-top: none; padding: 20px 16px 16px; box-shadow: inset 0 3px 12px rgba(0,0,0,.35), inset 0 -3px 10px rgba(0,0,0,.4);">
+      <div style="background: #0b0d10; border-radius: 12px; padding: 12px; box-shadow: inset 0 4px 14px rgba(0,0,0,.9); border: 2px solid #2b2f34;">
+        <div style="display: flex; gap: 9px;">
+          <div id="cell0" style="position: relative; flex: 1; height: 116px; background: linear-gradient(#171c22, #0c0f13); border-radius: 8px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; overflow: hidden; perspective: 420px; box-shadow: inset 0 3px 8px rgba(0,0,0,.75), inset 0 -2px 6px rgba(255,255,255,.04);">
+            <div id="flap0" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 72px; line-height: 1; color: #FFB627; transform-origin: center; transform: rotateX(0);"></div>
+            <div style="position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; background: rgba(0,0,0,.6); z-index: 3; box-shadow: 0 1px 0 rgba(255,255,255,.05);"></div>
+          </div>
+          <div id="cell1" style="position: relative; flex: 1; height: 116px; background: linear-gradient(#171c22, #0c0f13); border-radius: 8px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; overflow: hidden; perspective: 420px; box-shadow: inset 0 3px 8px rgba(0,0,0,.75), inset 0 -2px 6px rgba(255,255,255,.04);">
+            <div id="flap1" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 72px; line-height: 1; color: #FFB627; transform-origin: center; transform: rotateX(0);"></div>
+            <div style="position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; background: rgba(0,0,0,.6); z-index: 3; box-shadow: 0 1px 0 rgba(255,255,255,.05);"></div>
+          </div>
+          <div id="cell2" style="position: relative; flex: 1; height: 116px; background: linear-gradient(#171c22, #0c0f13); border-radius: 8px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; overflow: hidden; perspective: 420px; box-shadow: inset 0 3px 8px rgba(0,0,0,.75), inset 0 -2px 6px rgba(255,255,255,.04);">
+            <div id="flap2" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 72px; line-height: 1; color: #FFB627; transform-origin: center; transform: rotateX(0);"></div>
+            <div style="position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; background: rgba(0,0,0,.6); z-index: 3; box-shadow: 0 1px 0 rgba(255,255,255,.05);"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="caption" style="min-height: 3em; margin-top: 14px; text-align: center; font-size: 15px; line-height: 1.4; color: #EDE7DA; display: flex; align-items: center; justify-content: center; padding: 0 6px;"></div>
+
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 6px; gap: 12px;">
+        <div style="flex: 1; color: rgba(237,231,218,.55); font-size: 12px; letter-spacing: 1px; font-family: 'JetBrains Mono', monospace;">&#8601; PULL TO PLAY</div>
+        <div style="width: 60px; height: 132px; position: relative;">
+          <div style="position: absolute; left: 50%; transform: translateX(-50%); top: 24px; width: 12px; height: 100px; background: linear-gradient(90deg,#6f5416,#e0b955 45%,#8a6a24); border-radius: 8px; box-shadow: inset 0 0 3px rgba(0,0,0,.4);"></div>
+          <div id="leverKnob" style="position: absolute; left: 50%; top: 0; transform: translate(-50%, 0); width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at 34% 30%, #f0cf6a, #b3202c 62%, #7a1218); box-shadow: 0 6px 12px rgba(0,0,0,.5), inset 0 3px 6px rgba(255,255,255,.4), inset 0 -4px 8px rgba(0,0,0,.4); cursor: pointer; z-index: 4; transition: transform 200ms;"></div>
+        </div>
+      </div>
+    </div>
+    <div style="height: 14px; background: linear-gradient(#4a0f14, #2a080b); border-radius: 0 0 14px 14px; box-shadow: 0 8px 18px rgba(0,0,0,.55);"></div>
+  </div>
+
+  <!-- Departure board (hidden until climax) -->
+  <div id="board" style="position: absolute; z-index: 3; width: min(94vw, 470px); display: flex; flex-direction: column; align-items: center; gap: 16px; opacity: 0; transform: scale(.9); pointer-events: none;">
+    <div id="boardTop" style="display: flex; gap: 6px; justify-content: center;"></div>
+    <div id="boardBottom" style="display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #FFB627; font-size: clamp(13px, 4vw, 18px); letter-spacing: 1px; background: #101317; border: 1px solid #000; border-radius: 8px; padding: 12px 16px; box-shadow: inset 0 3px 10px rgba(0,0,0,.8);"></div>
+  </div>
+
+  <!-- Boarding pass (hidden until end) -->
+  <div id="pass" style="position: absolute; z-index: 5; width: min(94vw, 460px); opacity: 0; transform: translateY(46px) scale(.95); pointer-events: none; transition: opacity 700ms ease, transform 700ms cubic-bezier(.2,1,.3,1); display: flex; filter: drop-shadow(0 24px 40px rgba(0,0,0,.6));">
+    <div style="flex: 1; background: #EDE7DA; background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.015) 0 2px, transparent 2px 4px); color: #1A1A1A; border-radius: 10px 0 0 10px; padding: 18px 18px 16px; position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #1A1A1A; padding-bottom: 8px;">
+        <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: 2px; font-size: 15px;">BOARDING PASS</span>
+        <span style="font-family: 'Noto Sans TC', sans-serif; font-size: 13px; opacity: .7;">搭乗券</span>
+      </div>
+      <div style="display: flex; gap: 22px; margin-top: 14px; font-family: 'JetBrains Mono', monospace;">
+        <div>
+          <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">PASSENGER</div>
+          <div style="font-size: 17px; font-weight: 700; letter-spacing: 1px; margin-top: 2px;">YUN YI YANG</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: flex-end; gap: 18px; margin-top: 16px; font-family: 'JetBrains Mono', monospace;">
+        <div>
+          <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">FROM</div>
+          <div style="font-size: 30px; font-weight: 700; line-height: 1;">TPE</div>
+          <div style="font-family: 'Noto Sans TC', sans-serif; font-size: 11px; opacity: .6;">台北桃園</div>
+        </div>
+        <div style="font-size: 22px; padding-bottom: 16px;">&#9992;</div>
+        <div>
+          <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">TO</div>
+          <div style="font-size: 30px; font-weight: 700; line-height: 1;">FUK</div>
+          <div style="font-family: 'Noto Sans TC', sans-serif; font-size: 11px; opacity: .6;">福岡</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 22px; margin-top: 16px; font-family: 'JetBrains Mono', monospace;">
+        <div>
+          <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">DATE</div>
+          <div style="font-size: 15px; font-weight: 700;">OPEN</div>
+          <div style="font-family: 'Noto Sans TC', sans-serif; font-size: 10px; opacity: .6;">無使用期限</div>
+        </div>
+        <div>
+          <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">FLIGHT</div>
+          <div style="font-size: 15px; font-weight: 700;">BD-2026</div>
+        </div>
+        <div>
+          <div style="font-size: 9px; letter-spacing: 1.5px; opacity: .55;">GATE</div>
+          <div style="font-size: 15px; font-weight: 700;">B7</div>
+        </div>
+      </div>
+      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,.3); font-family: 'Noto Sans TC', sans-serif; font-size: 15px; font-weight: 400; color: #1A1A1A;">生日快樂。這次換我帶你去。</div>
+    </div>
+
+    <div style="width: 116px; background: #E4DCC9; background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.015) 0 2px, transparent 2px 4px); color: #1A1A1A; border-radius: 0 10px 10px 0; border-left: 2px dashed rgba(0,0,0,.35); padding: 18px 12px 16px; display: flex; flex-direction: column; gap: 12px; font-family: 'JetBrains Mono', monospace;">
+      <div><div style="font-size: 8px; letter-spacing: 1.5px; opacity: .55;">TO</div><div style="font-size: 24px; font-weight: 700;">FUK</div></div>
+      <div><div style="font-size: 8px; letter-spacing: 1.5px; opacity: .55;">SEAT</div><div style="font-size: 20px; font-weight: 700;">1A</div></div>
+      <div><div style="font-size: 8px; letter-spacing: 1.5px; opacity: .55;">BOARDING</div><div style="font-size: 18px; font-weight: 700;">09:25</div></div>
+      <div id="barcode" style="display: flex; align-items: flex-end; gap: 2px; height: 40px; margin-top: auto;"></div>
+    </div>
+  </div>
+
+  <button id="soundBtn" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 8; background: rgba(20,24,29,.85); color: #9a9488; border: 1px solid #2b2f34; border-radius: 22px; padding: 9px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px; cursor: pointer;">🔇 SOUND OFF</button>
+
+</div>
+
+<script>
+(() => {
+  // ---- tweakable copy ----
+  const JOKE1 = '恭喜獲得：你欠我的那杯珍奶（本人親自兌換）';
+  const JOKE2 = '差一個字。獎品：一句「欸差一點欸」';
+  const DEPART_LABEL = 'ANYTIME';
+
+  const $ = (id) => document.getElementById(id);
+  const nodes = {
+    stage: $('stage'), machine: $('machine'), lightbox: $('lightbox'), title: $('title'),
+    marquee: $('marquee'), caption: $('caption'), leverKnob: $('leverKnob'),
+    board: $('board'), boardTop: $('boardTop'), boardBottom: $('boardBottom'),
+    pass: $('pass'), barcode: $('barcode'), soundBtn: $('soundBtn'),
+    flap0: $('flap0'), flap1: $('flap1'), flap2: $('flap2'),
+    cell0: $('cell0'), cell1: $('cell1'), cell2: $('cell2'),
+  };
+
+  const rm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const POOL = ['H','B','D','A','K','U','F','8','2','6','9','T','G','0','5','P','E','N'];
+
+  const state = {
+    busy: false,
+    leverDisabled: false,
+    spinCount: 0,
+    soundOn: false,
+    climaxOn: false,
+    reelTimers: {},
+    reelIdx: { 0: 0, 1: 0, 2: 0 },
+    tapTimes: [],
+    chaseTimer: null,
+    twitchTimer: null,
+    actx: null,
+    boardCells: [],
+    botSpans: [],
+    boardingSpan: null,
+  };
+
+  function wait(ms) { return new Promise(r => setTimeout(r, rm ? Math.round(ms * 0.6) : ms)); }
+  function clearAllTimers() {
+    Object.values(state.reelTimers).forEach(t => clearInterval(t));
+    clearInterval(state.chaseTimer);
+    clearInterval(state.twitchTimer);
+  }
+
+  /* ---------- flap / reels ---------- */
+  function setFlap(i, ch, sound) {
+    const el = nodes['flap' + i];
+    if (!el) return;
+    el.textContent = ch;
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    if (!rm) el.style.animation = 'flap 90ms ease-out';
+    if (sound) snd('flap');
+  }
+  function startReel(i, fast) {
+    clearInterval(state.reelTimers[i]);
+    const iv = rm ? 110 : (fast ? 42 : 68);
+    state.reelTimers[i] = setInterval(() => {
+      state.reelIdx[i] = (state.reelIdx[i] + 1) % POOL.length;
+      setFlap(i, POOL[state.reelIdx[i]], false);
+    }, iv);
+  }
+  function clearReel(i) { clearInterval(state.reelTimers[i]); }
+  function stopReel(i, ch) {
+    clearInterval(state.reelTimers[i]);
+    setFlap(i, ch, true);
+    snd('thunk');
+  }
+
+  /* ---------- lever ---------- */
+  function leverPull() {
+    const k = nodes.leverKnob;
+    if (!k) return;
+    snd('click');
+    k.style.transition = 'transform 130ms ease-in';
+    k.style.transform = 'translate(-50%, 74px)';
+    setTimeout(() => {
+      k.style.transition = 'transform 320ms cubic-bezier(.2,1.5,.4,1)';
+      k.style.transform = 'translate(-50%, 0)';
+    }, 170);
+  }
+  function leverGrey(on) {
+    state.leverDisabled = on;
+    const k = nodes.leverKnob;
+    if (k) { k.style.filter = on ? 'grayscale(1) brightness(.45)' : 'none'; k.style.cursor = on ? 'not-allowed' : 'pointer'; }
+  }
+
+  /* ---------- marquee ---------- */
+  function buildBulbs() {
+    nodes.marquee.innerHTML = '';
+    for (let i = 0; i < 13; i++) {
+      const b = document.createElement('div');
+      b.style.cssText = 'width:9px;height:9px;border-radius:50%;background:#3a2a0e;';
+      nodes.marquee.appendChild(b);
+    }
+  }
+  function bulbSet(el, s) {
+    if (!el) return;
+    if (s === 'off') { el.style.background = '#3a2a0e'; el.style.boxShadow = 'none'; }
+    else if (s === 'dim') { el.style.background = '#7a5a1e'; el.style.boxShadow = '0 0 4px rgba(255,182,39,.3)'; }
+    else { el.style.background = '#FFB627'; el.style.boxShadow = '0 0 8px #FFB627, 0 0 16px rgba(255,182,39,.6)'; }
+  }
+  function startChase() {
+    clearInterval(state.chaseTimer);
+    const b = nodes.marquee ? [...nodes.marquee.children] : [];
+    let j = 0;
+    if (state.climaxOn) {
+      state.chaseTimer = setInterval(() => {
+        b.forEach((x, idx) => bulbSet(x, (idx % 2 === j % 2) ? 'full' : 'dim'));
+        j++;
+      }, rm ? 320 : 130);
+    } else {
+      state.chaseTimer = setInterval(() => {
+        b.forEach((x, idx) => bulbSet(x, idx === j % b.length ? 'dim' : 'off'));
+        j++;
+      }, 230);
+    }
+  }
+  async function marqueeDie() {
+    clearInterval(state.chaseTimer);
+    const b = nodes.marquee ? [...nodes.marquee.children] : [];
+    const n = b.length;
+    for (let k = 0; k < Math.ceil(n / 2); k++) {
+      bulbSet(b[k], 'off'); bulbSet(b[n - 1 - k], 'off');
+      snd('flap');
+      await wait(55);
+    }
+  }
+
+  /* ---------- twitch / shake ---------- */
+  function twitch(on) {
+    clearInterval(state.twitchTimer);
+    const cells = [0,1,2].map(i => nodes['flap' + i]);
+    if (on) {
+      state.twitchTimer = setInterval(() => {
+        cells.forEach(c => { if (c) c.style.transform = `translate(${(Math.random()*4-2).toFixed(1)}px, ${(Math.random()*4-2).toFixed(1)}px)`; });
+      }, 55);
+    } else {
+      cells.forEach(c => { if (c) c.style.transform = 'rotateX(0)'; });
+    }
+  }
+  function shake(level) {
+    const m = nodes.machine;
+    if (!m || rm) return;
+    const name = level === 'big' ? 'shkBig' : 'shk';
+    const dur = level === 'light' ? 150 : level === 'big' ? 320 : 220;
+    m.style.animation = 'none'; void m.offsetWidth;
+    m.style.animation = `${name} ${dur}ms ease`;
+  }
+
+  /* ---------- caption ---------- */
+  function caption(text, mode) {
+    const el = nodes.caption;
+    if (!el) return;
+    el.textContent = text;
+    el.style.color = mode === 'err' ? '#FF6161' : mode === 'meh' ? '#9a9488' : mode === 'win' ? '#FFB627' : '#EDE7DA';
+    el.style.fontFamily = (mode === 'err') ? "'JetBrains Mono', monospace" : "'Noto Sans TC', sans-serif";
+    el.style.fontWeight = mode === 'err' ? 700 : 400;
+    el.style.letterSpacing = mode === 'err' ? '2px' : '0';
+    el.style.textShadow = mode === 'win' ? '0 0 12px rgba(255,182,39,.6)' : 'none';
+  }
+
+  /* ---------- board build ---------- */
+  function boardCellStyle() {
+    return 'position:relative;width:clamp(38px,11vw,54px);height:clamp(54px,15vw,74px);background:#101317;border:1px solid #000;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;perspective:340px;box-shadow:inset 0 3px 8px rgba(0,0,0,.85);font-family:JetBrains Mono,monospace;font-weight:700;font-size:clamp(26px,7vw,40px);color:#FFB627;';
+  }
+  function buildBoard() {
+    const top = nodes.boardTop;
+    if (!top) return;
+    top.innerHTML = '';
+    state.boardCells = [];
+    ['H','B','D','→','F','U','K'].forEach((ch, idx) => {
+      const c = document.createElement('div');
+      c.setAttribute('style', boardCellStyle());
+      const t = document.createElement('div');
+      t.textContent = idx < 3 ? ch : '';
+      t.dataset.ch = ch;
+      c.appendChild(t);
+      const line = document.createElement('div');
+      line.setAttribute('style', 'position:absolute;left:2px;right:2px;top:50%;height:2px;background:rgba(0,0,0,.6);');
+      c.appendChild(line);
+      top.appendChild(c);
+      state.boardCells.push(t);
+    });
+    const bot = nodes.boardBottom;
+    bot.innerHTML = '';
+    state.botSpans = [];
+    [`DEP ${DEPART_LABEL}`, 'GATE B7', 'STATUS:'].forEach(txt => {
+      const s = document.createElement('span');
+      s.textContent = txt;
+      s.style.opacity = '0';
+      s.style.transition = 'opacity 260ms';
+      bot.appendChild(s);
+      state.botSpans.push(s);
+    });
+    const bd = document.createElement('span');
+    bd.textContent = 'BOARDING';
+    bd.style.opacity = '0';
+    bd.style.transition = 'opacity 260ms';
+    bot.appendChild(bd);
+    state.botSpans.push(bd);
+    state.boardingSpan = bd;
+  }
+  function buildBarcode() {
+    const bc = nodes.barcode;
+    if (!bc) return;
+    bc.innerHTML = '';
+    const widths = [3,1,2,1,3,1,1,2,3,1,2,1,1,3,1,2,2,1,3,1,1,2];
+    widths.forEach(w => {
+      const d = document.createElement('div');
+      d.setAttribute('style', `width:${w}px;height:100%;background:#1A1A1A;`);
+      bc.appendChild(d);
+    });
+  }
+
+  /* ---------- climax visuals ---------- */
+  function ambientWash() {
+    if (rm) return;
+    const w = document.createElement('div');
+    w.setAttribute('style', 'position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(60% 50% at 50% 45%,rgba(255,182,39,.9),transparent 70%);animation:washpulse 900ms ease forwards;');
+    nodes.stage.appendChild(w);
+    setTimeout(() => w.remove(), 1000);
+  }
+  function spawnConfetti() {
+    if (rm) return;
+    const colors = ['#FFB627','#C89B3C','#EDE7DA','#ffffff'];
+    for (let i = 0; i < 44; i++) {
+      const p = document.createElement('div');
+      const size = 6 + Math.random() * 8;
+      p.setAttribute('style', `position:absolute;top:-24px;left:${Math.random()*100}%;width:${size}px;height:${size*0.5}px;background:${colors[i%4]};z-index:6;pointer-events:none;opacity:.95;animation:confetti ${1.6+Math.random()*1.4}s linear ${Math.random()*0.5}s forwards;`);
+      nodes.stage.appendChild(p);
+      setTimeout(() => p.remove(), 3600);
+    }
+  }
+  function climax() {
+    state.climaxOn = true;
+    startChase();
+    [0,1,2].forEach(i => { const el = nodes['flap'+i]; if (el) el.style.textShadow = '0 0 14px #FFB627, 0 0 30px rgba(255,182,39,.85)'; });
+    if (nodes.lightbox) nodes.lightbox.style.boxShadow = '0 0 40px rgba(255,182,39,.7), 0 6px 0 #6f5416, 0 12px 24px rgba(0,0,0,.5)';
+    ambientWash();
+    spawnConfetti();
+    snd('ding');
+  }
+
+  async function expandToBoard() {
+    const m = nodes.machine, b = nodes.board;
+    snd('whoosh');
+    m.style.transition = 'opacity 600ms ease, transform 600ms ease';
+    m.style.opacity = '0';
+    m.style.transform = 'scale(1.05)';
+    b.style.transition = 'opacity 550ms ease, transform 550ms cubic-bezier(.2,1,.3,1)';
+    b.style.opacity = '1';
+    b.style.transform = 'scale(1)';
+    await wait(650);
+    m.style.display = 'none';
+  }
+  async function boardFlipTop() {
+    for (const idx of [3,4,5,6]) {
+      const t = state.boardCells[idx];
+      t.textContent = t.dataset.ch;
+      t.style.animation = 'none'; void t.offsetWidth;
+      if (!rm) t.style.animation = 'flap 120ms ease-out';
+      snd('flap');
+      await wait(230);
+    }
+  }
+  async function boardFlipBottom() {
+    for (const s of state.botSpans) {
+      s.style.opacity = '1';
+      snd('flap');
+      await wait(220);
+    }
+    if (!rm) state.boardingSpan.style.animation = 'blink 900ms steps(1) infinite';
+  }
+  function revealPass() {
+    const b = nodes.board, p = nodes.pass;
+    b.style.transition = 'opacity 600ms ease, transform 600ms ease';
+    b.style.opacity = '.14';
+    b.style.transform = 'translateY(-34%) scale(.82)';
+    p.style.opacity = '1';
+    p.style.transform = 'translateY(0) scale(1)';
+    snd('ding2');
+  }
+
+  /* ---------- pull scripts ---------- */
+  async function doPull1() {
+    leverPull();
+    caption('', '');
+    [0,1,2].forEach(i => startReel(i));
+    await wait(650); stopReel(0, 'N');
+    await wait(420); stopReel(1, 'O');
+    await wait(420); stopReel(2, '!');
+    snd('sad');
+    caption(JOKE1, 'meh');
+  }
+  async function doPull2() {
+    leverPull();
+    caption('', '');
+    [0,1,2].forEach(i => startReel(i));
+    await wait(900); stopReel(0, 'H'); caption('H…', 'win');
+    await wait(700); stopReel(1, 'B'); caption('H B…！', 'win');
+    await wait(480);
+    clearReel(2);
+    setFlap(2, 'D', true);
+    caption('H B D？！', 'win');
+    await wait(300);
+    for (const c of ['F','G','K','A']) { setFlap(2, c, true); await wait(115); }
+    stopReel(2, '💩');
+    snd('sad');
+    caption(JOKE2, 'meh');
+  }
+  async function doPull3() {
+    leverPull();
+    caption('', '');
+    [0,1,2].forEach(i => startReel(i));
+    await wait(800);
+    [0,1,2].forEach(i => clearReel(i));
+    twitch(true);
+    snd('glitch');
+    await marqueeDie();
+    nodes.machine.style.transition = 'filter 900ms ease';
+    nodes.machine.style.filter = 'grayscale(1) brightness(.62)';
+    await wait(500);
+    twitch(false);
+    setFlap(0, '4', true); setFlap(1, '0', true); setFlap(2, '4', true);
+    [0,1,2].forEach(i => { const e = nodes['flap'+i]; if (e) e.style.color = '#FF6161'; });
+    caption('ERR 404 — PRIZE NOT FOUND', 'err');
+    snd('error');
+    leverGrey(true);
+    await new Promise(r => setTimeout(r, 3000));
+    snd('reboot');
+    leverGrey(false);
+    if (!rm) {
+      const wash = document.createElement('div');
+      wash.setAttribute('style', 'position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(0deg,rgba(255,182,39,.6),transparent);clip-path:inset(100% 0 0 0);transition:clip-path 900ms ease;');
+      nodes.stage.appendChild(wash);
+      void wash.offsetWidth;
+      wash.style.clipPath = 'inset(0 0 0 0)';
+      setTimeout(() => { wash.style.transition = 'opacity 500ms'; wash.style.opacity = '0'; setTimeout(() => wash.remove(), 520); }, 700);
+    }
+    nodes.machine.style.filter = 'none';
+    [0,1,2].forEach(i => { const e = nodes['flap'+i]; if (e) e.style.color = '#FFB627'; setFlap(i, '', false); });
+    if (nodes.lightbox) nodes.lightbox.style.boxShadow = '';
+    startChase();
+    caption('…系統回復中…', 'meh');
+    await wait(1100);
+    state.spinCount = 4;
+    await doPull4();
+    state.busy = false;
+  }
+  async function reel2ExtraLoop() {
+    const dur = rm ? 420 : 820;
+    const t0 = Date.now();
+    let idx = 0;
+    while (Date.now() - t0 < dur) {
+      idx = (idx + 1) % POOL.length;
+      setFlap(2, POOL[idx], false);
+      await wait(rm ? 70 : 46);
+    }
+  }
+  async function doPull4() {
+    caption('', '');
+    leverPull();
+    await wait(300);
+    [0,1,2].forEach(i => startReel(i, true));
+    await wait(900);  stopReel(0, 'H'); shake('light');
+    await wait(700);  stopReel(1, 'B'); shake('med');
+    await wait(700);
+    clearReel(2);
+    await reel2ExtraLoop();
+    stopReel(2, 'D'); shake('big');
+    await wait(120);
+    climax();
+    caption('H B D 🎂✈', 'win');
+    await wait(720);
+    await expandToBoard();
+    await boardFlipTop();
+    await wait(250);
+    await boardFlipBottom();
+    await wait(500);
+    revealPass();
+  }
+
+  /* ---------- controls ---------- */
+  function onLever() {
+    if (state.busy || state.leverDisabled) return;
+    initAudio();
+    const n = state.spinCount;
+    if (n === 0) { state.busy = true; state.spinCount = 1; doPull1().then(() => state.busy = false); }
+    else if (n === 1) { state.busy = true; state.spinCount = 2; doPull2().then(() => state.busy = false); }
+    else if (n === 2) { state.busy = true; state.spinCount = 3; doPull3(); }
+  }
+  function onTitleTap() {
+    const now = Date.now();
+    state.tapTimes = state.tapTimes.filter(t => now - t < 1200);
+    state.tapTimes.push(now);
+    if (state.tapTimes.length >= 3) { state.tapTimes = []; reset(); }
+  }
+  function reset() {
+    clearAllTimers();
+    state.busy = false; state.leverDisabled = false; state.spinCount = 0; state.climaxOn = false;
+    state.reelIdx = { 0: 0, 1: 0, 2: 0 };
+    const m = nodes.machine;
+    m.style.display = ''; m.style.transition = 'none'; m.style.opacity = '1'; m.style.transform = 'none'; m.style.filter = 'none'; m.style.animation = 'none';
+    if (nodes.lightbox) nodes.lightbox.style.boxShadow = '';
+    [0,1,2].forEach(i => { const e = nodes['flap'+i]; if (e) { e.textContent = ''; e.style.color = '#FFB627'; e.style.textShadow = 'none'; e.style.transform = 'rotateX(0)'; e.style.animation = 'none'; } });
+    nodes.board.style.transition = 'none'; nodes.board.style.opacity = '0'; nodes.board.style.transform = 'scale(.9)';
+    nodes.pass.style.opacity = '0'; nodes.pass.style.transform = 'translateY(46px) scale(.95)';
+    leverGrey(false);
+    buildBoard();
+    startChase();
+    caption('拉下拉桿，開始你的生日抽獎 🎂', '');
+  }
+  function onSound() {
+    state.soundOn = !state.soundOn;
+    if (state.soundOn) initAudio();
+    const b = nodes.soundBtn;
+    if (b) { b.textContent = state.soundOn ? '🔊 SOUND ON' : '🔇 SOUND OFF'; b.style.color = state.soundOn ? '#FFB627' : '#9a9488'; }
+  }
+
+  /* ---------- audio ---------- */
+  function initAudio() {
+    if (state.actx) { if (state.actx.state === 'suspended') state.actx.resume(); return; }
+    try { state.actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+  }
+  function tone(freq, dur, type, vol, slideTo) {
+    if (!state.soundOn || !state.actx) return;
+    const ctx = state.actx, t = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.14, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  function snd(type) {
+    if (!state.soundOn || !state.actx) return;
+    switch (type) {
+      case 'click': tone(150, 0.06, 'square', 0.16); break;
+      case 'flap': tone(680 + Math.random()*120, 0.028, 'triangle', 0.06); break;
+      case 'thunk': tone(90, 0.09, 'sine', 0.2); tone(150, 0.05, 'square', 0.08); break;
+      case 'sad': [392,349,294].forEach((f,i)=>setTimeout(()=>tone(f,0.18,'triangle',0.12),i*150)); break;
+      case 'glitch': for(let i=0;i<6;i++) setTimeout(()=>tone(200+Math.random()*900,0.04,'square',0.08),i*45); break;
+      case 'error': tone(160,0.5,'sawtooth',0.16,110); break;
+      case 'reboot': tone(220,0.7,'sine',0.12,880); break;
+      case 'whoosh': tone(300,0.5,'sawtooth',0.07,1400); break;
+      case 'ding': tone(1180,0.6,'sine',0.2); tone(1770,0.6,'sine',0.09); setTimeout(()=>tone(2360,0.5,'sine',0.06),60); break;
+      case 'ding2': tone(880,0.4,'sine',0.14); tone(1320,0.5,'sine',0.08); break;
+    }
+  }
+
+  /* ---------- boot ---------- */
+  nodes.leverKnob.addEventListener('click', onLever);
+  nodes.title.addEventListener('click', onTitleTap);
+  nodes.soundBtn.addEventListener('click', onSound);
+  buildBulbs();
+  caption('拉下拉桿，開始你的生日抽獎 🎂', '');
+  buildBoard();
+  buildBarcode();
+  startChase();
+})();
+</script>
+</body>
+</html>
