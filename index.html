@@ -141,6 +141,9 @@
     </div>
   </div>
 
+  <!-- Permanent blackout once every prize is gone — no way back. -->
+  <div id="blackoutOverlay" style="position: fixed; inset: 0; z-index: 30; background: #000; opacity: 0; pointer-events: none; transition: opacity 1500ms ease;"></div>
+
 </div>
 
 <script>
@@ -229,6 +232,7 @@
     board: $('board'), boardTop: $('boardTop'), boardBottom: $('boardBottom'),
     pass: $('pass'), barcode: $('barcode'), soundBtn: $('soundBtn'), secretBtn: $('secretBtn'),
     prizeListBtn: $('prizeListBtn'), prizeModal: $('prizeModal'), prizeListContent: $('prizeListContent'), prizeCloseBtn: $('prizeCloseBtn'),
+    blackoutOverlay: $('blackoutOverlay'),
     flap0: $('flap0'), flap1: $('flap1'), flap2: $('flap2'),
     cell0: $('cell0'), cell1: $('cell1'), cell2: $('cell2'),
   };
@@ -259,7 +263,17 @@
     boardingSpan: null,
     wonPrizes: [],
     remainingStock: {},
+    blackout: false,
   };
+
+  function triggerBlackout() {
+    if (state.blackout) return;
+    state.blackout = true;
+    clearAllTimers();
+    if (state.actx) { try { state.actx.close(); } catch (e) {} }
+    nodes.blackoutOverlay.style.pointerEvents = 'auto';
+    nodes.blackoutOverlay.style.opacity = '1';
+  }
 
   function initStock() {
     state.remainingStock = {};
@@ -462,7 +476,7 @@
       container.appendChild(row);
     });
   }
-  function openPrizeModal() { nodes.prizeModal.style.display = 'flex'; renderPrizeList(); }
+  function openPrizeModal() { if (state.blackout) return; nodes.prizeModal.style.display = 'flex'; renderPrizeList(); }
   function closePrizeModal() { nodes.prizeModal.style.display = 'none'; }
 
   /* ---------- board build ---------- */
@@ -603,6 +617,10 @@
     caption(`恭喜獲得：${a.label}`, 'meh');
     state.wonPrizes.push(a);
     if (nodes.prizeModal.style.display !== 'none') renderPrizeList();
+    if (availablePrizes().length < 1) {
+      await wait(1400);
+      triggerBlackout();
+    }
   }
   async function doTeaseLoss() {
     const entry = CONFIG.tease;
@@ -729,13 +747,13 @@
 
   /* ---------- controls ---------- */
   function onLever() {
-    if (state.busy || state.leverDisabled || state.gameOver) return;
+    if (state.busy || state.leverDisabled || state.gameOver || state.blackout) return;
     initAudio();
     state.busy = true;
     runPull().then(() => { state.busy = false; });
   }
   function onSecret() {
-    if (state.gameOver) return;
+    if (state.gameOver || state.blackout) return;
     state.pendingJackpot = true;
     if (!state.busy) {
       initAudio();
@@ -744,6 +762,7 @@
     }
   }
   function onTitleTap() {
+    if (state.blackout) return;
     const now = Date.now();
     state.tapTimes = state.tapTimes.filter(t => now - t < 1200);
     state.tapTimes.push(now);

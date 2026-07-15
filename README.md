@@ -35,7 +35,9 @@ python3 -m http.server 8080
    intentional, not a bug — then the machine reboots itself and is ready
    for another pull.
 3. Tap **🎁 獎品清單** (bottom-right) any time to see everything won so
-   far this session, tallied by prize.
+   far this session, tallied by prize. If every prize has a `stock` cap
+   and the last one gets claimed, the screen permanently fades to black —
+   this is a dead end by design, see "Making it your own" below.
 4. To make the jackpot happen, tap the **invisible button in the top-right
    corner of the screen** (a 72×72px hotspot, `#secretBtn` in the HTML —
    there's nothing to see, you just have to know it's there). The machine
@@ -113,13 +115,16 @@ adjusts automatically (needs at least 1 entry with stock left). Each prize
 just needs an `emoji` (fills all 3 reels when drawn) and a `label` (the
 full text, any length); add `stock: N` to cap how many times a prize can
 ever be won in one session — once it's out, it silently stops appearing in
-draws and the 獎品清單 shows "限量款，已送完" next to it. If you cap
-enough prizes that none are left with stock (e.g. you give every prize a
-`stock`), the machine shows an `ERR 404 — 獎品沒了` sold-out message on
-every pull instead of drawing — right now only `黃嘟嘟為你取名頂級券` is
-capped, so this state isn't reachable unless you add `stock` to more
-prizes too. Change the prizes, the trip, the passenger name, whatever —
-save the file and reload.
+draws and the 獎品清單 shows "限量款，已送完" next to it.
+
+If you cap enough prizes that **none** are left with stock (e.g. you give
+every prize a `stock`), the moment the very last one is claimed the whole
+screen **permanently fades to black** — lever, hidden jackpot trigger,
+prize list, and the title-tap reset all stop responding for the rest of
+the session. There is no way back short of reloading the page. Right now
+only `黃嘟嘟為你取名頂級券` is capped, so this can't happen yet unless you
+add `stock` to the rest of the prizes too. Change the prizes, the trip,
+the passenger name, whatever — save the file and reload.
 
 Want the hidden trigger somewhere other than the top-right corner? It's
 the `#secretBtn` element right after the `SOUND OFF` button in the HTML —
